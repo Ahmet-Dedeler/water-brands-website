@@ -1,18 +1,16 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import waterData from '@/data/water_data.json';
 import ingredientsMap from '@/data/ingredients.json';
 import { WaterData, Ingredient, IngredientsMap } from '@/types';
 import Header from '@/components/Header';
 import { Metadata } from 'next';
 
-type Props = {
-  params: { id: string }
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
   const allWaters = waterData as WaterData[];
-  const water = allWaters.find(w => w.id.toString() === params.id);
+  const water = allWaters.find(w => w.id.toString() === id);
 
   if (!water) {
     return {
@@ -38,12 +36,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default function WaterDetailsPage({ params }: { params: { id: string } }) {
+export default async function WaterDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const showSources = false; // Set to true to display the sources section
   const allWaters = waterData as WaterData[];
   const allIngredients = ingredientsMap as IngredientsMap;
 
-  const water = allWaters.find(w => w.id.toString() === params.id);
+  const water = allWaters.find(w => w.id.toString() === id);
 
   if (!water) {
     notFound();
@@ -70,8 +69,8 @@ export default function WaterDetailsPage({ params }: { params: { id: string } })
         <div className="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
           <div className="p-6 md:p-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="flex items-center justify-center bg-gray-50 rounded-lg p-4 h-48 md:h-full">
-                <img src={water.image} alt={water.name} className="max-h-full max-w-full object-contain" />
+              <div className="relative flex items-center justify-center bg-gray-50 rounded-lg p-4 h-48 md:h-full">
+                <Image src={water.image} alt={water.name} fill style={{objectFit:"contain"}} />
               </div>
               <div className="md:col-span-2">
                 <h1 className="text-3xl font-bold text-gray-900">{water.name}</h1>

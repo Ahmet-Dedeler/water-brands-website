@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import waterData from '@/data/water_data.json';
 import { WaterData } from '@/types';
 import Header from '@/components/Header';
@@ -19,8 +20,8 @@ export default function Home() {
         <div className="space-y-4">
           {sortedWaters.map((water) => (
             <Link key={water.id} href={`/water/${water.id}`} className="flex items-center bg-white p-4 pr-6 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200">
-              <div className="w-16 h-16 flex-shrink-0 mr-6 flex items-center justify-center">
-                <img src={water.image} alt={water.name} className="max-h-full max-w-full object-contain" />
+              <div className="relative w-16 h-16 flex-shrink-0 mr-6 flex items-center justify-center">
+                <Image src={water.image} alt={water.name} fill style={{objectFit:"contain"}} />
               </div>
               <div className="flex-grow">
                 <h2 className="text-lg font-semibold text-gray-800">{water.name}</h2>

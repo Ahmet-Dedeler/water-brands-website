@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import { WaterData } from '@/types';
 
@@ -22,6 +23,7 @@ export default function Header({ waters }: { waters: WaterData[] }) {
         }
     }, [query, waters]);
 
+    //handle click outside of search
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -62,7 +64,7 @@ export default function Header({ waters }: { waters: WaterData[] }) {
                                     {results.map(water => (
                                         <li key={water.id}>
                                             <Link href={`/water/${water.id}`} className="flex items-center p-3 hover:bg-gray-50" onClick={() => setIsFocused(false)}>
-                                                <img src={water.image} alt={water.name} className="w-8 h-8 object-contain mr-4"/>
+                                                <Image src={water.image} alt={water.name} width={32} height={32} className="w-8 h-8 object-contain mr-4"/>
                                                 <span className="text-sm font-medium text-gray-700">{water.name}</span>
                                             </Link>
                                         </li>
