@@ -1,10 +1,13 @@
 'use client';
 
+
+// imports
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import { WaterData } from '@/types';
 
+// The function that renders the header
 export default function Header({ waters }: { waters: WaterData[] }) {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<WaterData[]>([]);
@@ -23,7 +26,7 @@ export default function Header({ waters }: { waters: WaterData[] }) {
         }
     }, [query, waters]);
 
-    //handle click outside of search
+    //handle click outside of search.
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -34,7 +37,7 @@ export default function Header({ waters }: { waters: WaterData[] }) {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [searchRef]);
 
-
+    // final stuff
     return (
         <header className="bg-transparent mb-8">
             <div className="max-w-4xl mx-auto px-4">
