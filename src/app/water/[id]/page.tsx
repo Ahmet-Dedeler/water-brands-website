@@ -52,9 +52,15 @@ export default async function WaterDetailsPage({ params }: { params: Promise<{ i
     const details = allIngredients[ing.ingredient_id];
     return details ? { ...ing, ...details } : ing;
   };
+  const hasIngredientName = (ing: Ingredient): ing is Ingredient & { name: string } =>
+    typeof ing.name === 'string' && ing.name.trim().length > 0;
 
-  const contaminants = water.ingredients.filter(ing => ing.is_contaminant).map(getFullIngredient);
-  const nutrients = water.ingredients.filter(ing => !ing.is_contaminant).map(getFullIngredient);
+  const listedIngredients = water.ingredients
+    .filter((ing): ing is Ingredient => Boolean(ing))
+    .map(getFullIngredient)
+    .filter(hasIngredientName);
+  const contaminants = listedIngredients.filter(ing => ing.is_contaminant);
+  const nutrients = listedIngredients.filter(ing => !ing.is_contaminant);
 
   const labTested = water.score_breakdown.find(item => item.id === 'untested_penalty')?.score === 0 ? "Yes" : "No";
   const microplastics = water.packaging === 'plastic' ? "High Risk" : "Minimal";
@@ -145,4 +151,4 @@ export default async function WaterDetailsPage({ params }: { params: Promise<{ i
       </div>
     </main>
   );
-} 
+}

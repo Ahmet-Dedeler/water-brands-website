@@ -20,7 +20,7 @@ export interface WaterData {
     score: number;
     description: string;
     image: string;
-    ingredients: Ingredient[];
+    ingredients: Array<Ingredient | null>;
     sources: { url: string; label: string }[];
     packaging: string;
     score_breakdown: { id: string; score: number }[];
@@ -32,4 +32,4 @@ export interface IngredientsMap {
         benefits: string | null;
         risks: string | null;
     };
-} 
+}
