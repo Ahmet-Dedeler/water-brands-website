@@ -135,37 +135,40 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-20 bg-white/85 dark:bg-[var(--surface-page)]/90 backdrop-blur border-b border-gray-100 dark:border-[var(--border-soft)] mb-8">
       <div className="max-w-6xl mx-auto px-4">
-        <div className="flex justify-between items-center gap-4 py-3">
-          <Link href="/" className="flex items-center gap-2 font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap shrink-0">
-            <span className="text-xl">🚰</span>
-            <span className="hidden sm:inline">Water Leaderboard</span>
-          </Link>
+        <div className="flex flex-col gap-3 py-3 lg:flex-row lg:items-center lg:gap-4">
+          {/* Logo + nav share one row on small screens (justify-between); at lg
+              the wrapper dissolves so all three items sit on a single bar. */}
+          <div className="flex items-center justify-between gap-2 lg:contents">
+            <Link href="/" className="flex items-center gap-2 font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap shrink-0">
+              <span className="text-xl">🚰</span>
+              <span className="hidden sm:inline">Water Leaderboard</span>
+            </Link>
 
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 justify-end">
-            <nav className="flex items-center gap-1 shrink-0" aria-label="Product categories">
-              <Link href="/" className={navLinkClass(section === 'drinks')}>
+            <nav className="flex items-center gap-1 shrink-0 lg:ml-auto" aria-label="Product categories">
+              <Link href="/" aria-label="Drinks" className={navLinkClass(section === 'drinks')}>
                 <span aria-hidden="true">💧</span>
-                Drinks
+                <span className="hidden lg:inline">Drinks</span>
               </Link>
-              <Link href="/filter" className={navLinkClass(section === 'filter')}>
+              <Link href="/filter" aria-label="Filter" className={navLinkClass(section === 'filter')}>
                 <span aria-hidden="true">🫖</span>
-                Filter
+                <span className="hidden lg:inline">Filter</span>
               </Link>
-              <Link href="/tap-water" className={navLinkClass(section === 'tap-water')}>
+              <Link href="/tap-water" aria-label="Tap" className={navLinkClass(section === 'tap-water')}>
                 <span aria-hidden="true">🚰</span>
-                Tap
+                <span className="hidden lg:inline">Tap</span>
               </Link>
-              <Link href="/ingredients" className={navLinkClass(section === 'ingredient')}>
+              <Link href="/ingredients" aria-label="Ingredients" className={navLinkClass(section === 'ingredient')}>
                 <span aria-hidden="true">🧪</span>
-                Ingredients
+                <span className="hidden lg:inline">Ingredients</span>
               </Link>
-              <Link href="/scoring" className={navLinkClass(section === 'scoring')}>
+              <Link href="/scoring" aria-label="Scoring" className={navLinkClass(section === 'scoring')}>
                 <span aria-hidden="true">📊</span>
-                Scoring
+                <span className="hidden lg:inline">Scoring</span>
               </Link>
             </nav>
+          </div>
 
-            <div ref={searchRef} className="relative w-full max-w-md min-w-0" role="search">
+          <div ref={searchRef} className="relative w-full min-w-0 lg:w-96" role="search">
               <label htmlFor="product-search" className="sr-only">
                 {searchLabel}
               </label>
@@ -273,7 +276,6 @@ export default function Header() {
             </div>
           </div>
         </div>
-      </div>
     </header>
   );
 }

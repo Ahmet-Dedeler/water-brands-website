@@ -8,8 +8,20 @@
     --border-soft: #e5e7eb;
   }
 
+  /* Soft blue-slate — cozy dark mode, not pitch black.
+     Follow the system preference so these surface variables stay in sync with
+     Tailwind v4's `dark:` utilities (which default to prefers-color-scheme). */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --surface-page: #1e2938;
+      --surface-raised: #2d3a4f;
+      --surface-muted: #38465c;
+      --border-soft: #4a5a72;
+    }
+  }
+
+  /* Explicit override hook, in case a manual theme toggle is added later. */
   .dark {
-    /* Soft blue-slate — cozy dark mode, not pitch black */
     --surface-page: #1e2938;
     --surface-raised: #2d3a4f;
     --surface-muted: #38465c;
