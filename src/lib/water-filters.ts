@@ -8,29 +8,29 @@ export const EMPTY_FILTERS: WaterRankingFilters = {
   waterSource: null,
 };
 
-export const PACKAGING_OPTIONS: { value: PackagingFilter; label: string }[] = [
-  { value: 'plastic', label: 'Plastic' },
-  { value: 'glass', label: 'Glass' },
-  { value: 'cardboard', label: 'Cardboard' },
-  { value: 'aluminum', label: 'Aluminum' },
-  { value: 'aluminum (can)', label: 'Aluminum (can)' },
+export const PACKAGING_OPTIONS: { value: PackagingFilter; label: string; emoji: string }[] = [
+  { value: 'plastic', label: 'Plastic', emoji: '🥤' },
+  { value: 'glass', label: 'Glass', emoji: '🫙' },
+  { value: 'cardboard', label: 'Cardboard', emoji: '📦' },
+  { value: 'aluminum', label: 'Aluminum', emoji: '🔩' },
+  { value: 'aluminum (can)', label: 'Aluminum (can)', emoji: '🥫' },
 ];
 
-export const SOURCE_OPTIONS: { value: WaterSourceFilter; label: string }[] = [
-  { value: 'municipal_supply', label: 'Municipal' },
-  { value: 'mountain_spring', label: 'Mtn spring' },
-  { value: 'spring', label: 'Spring' },
-  { value: 'well', label: 'Well' },
-  { value: 'aquifer', label: 'Aquifer' },
-  { value: 'iceberg', label: 'Iceberg' },
-  { value: 'rain', label: 'Rain' },
-  { value: 'unknown', label: 'Unknown' },
+export const SOURCE_OPTIONS: { value: WaterSourceFilter; label: string; emoji: string }[] = [
+  { value: 'municipal_supply', label: 'Municipal', emoji: '🏙️' },
+  { value: 'mountain_spring', label: 'Mtn spring', emoji: '⛰️' },
+  { value: 'spring', label: 'Spring', emoji: '💧' },
+  { value: 'well', label: 'Well', emoji: '🕳️' },
+  { value: 'aquifer', label: 'Aquifer', emoji: '🪨' },
+  { value: 'iceberg', label: 'Iceberg', emoji: '🧊' },
+  { value: 'rain', label: 'Rain', emoji: '🌧️' },
+  { value: 'unknown', label: 'Unknown', emoji: '❓' },
 ];
 
-export const CAP_SAFETY_OPTIONS: { value: CapSafety; label: string }[] = [
-  { value: 'low', label: 'Low risk' },
-  { value: 'moderate', label: 'Moderate risk' },
-  { value: 'high', label: 'Leaching' },
+export const CAP_SAFETY_OPTIONS: { value: CapSafety; label: string; emoji: string }[] = [
+  { value: 'low', label: 'Low risk', emoji: '✅' },
+  { value: 'moderate', label: 'Moderate risk', emoji: '⚠️' },
+  { value: 'high', label: 'Leaching', emoji: '☣️' },
 ];
 
 export function countActiveFilters(filters: WaterRankingFilters): number {

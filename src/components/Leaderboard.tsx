@@ -16,12 +16,12 @@ const PAGE_SIZE = 60;
 
 type TypeFilter = 'all' | WaterType;
 
-const TYPE_FILTERS: { key: TypeFilter; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'bottled_water', label: 'Still' },
-  { key: 'sparkling_water', label: 'Sparkling' },
-  { key: 'water_gallon', label: 'Gallon' },
-  { key: 'flavored_water', label: 'Flavored' },
+const TYPE_FILTERS: { key: TypeFilter; label: string; emoji: string }[] = [
+  { key: 'all', label: 'All', emoji: '🌊' },
+  { key: 'bottled_water', label: 'Still', emoji: '💧' },
+  { key: 'sparkling_water', label: 'Sparkling', emoji: '🫧' },
+  { key: 'water_gallon', label: 'Gallon', emoji: '🪣' },
+  { key: 'flavored_water', label: 'Flavored', emoji: '🍋' },
 ];
 
 function ScoreBadge({ score }: { score: number }) {
@@ -95,26 +95,54 @@ export default function Leaderboard({ waters }: { waters: WaterCard[] }) {
 
   return (
     <div>
-      <div className="flex flex-wrap items-center gap-2 mb-4">
-        <button
-          type="button"
-          onClick={() => setFiltersOpen((open) => !open)}
-          className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-            filtersOpen || activeFilterCount > 0
-              ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900'
-              : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-          }`}
-        >
-          Filters
-          {activeFilterCount > 0 && (
-            <span className="inline-flex items-center justify-center min-w-5 h-5 px-1 rounded-full bg-white/20 dark:bg-black/10 text-xs font-bold">
-              {activeFilterCount}
+      <div className="flex flex-wrap items-center gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 flex-1 min-w-0">
+          {TYPE_FILTERS.map((f) => {
+            const active = typeFilter === f.key;
+            return (
+              <button
+                key={f.key}
+                type="button"
+                onClick={() => {
+                  setTypeFilter(f.key);
+                  resetPagination();
+                }}
+                className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  active
+                    ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900'
+                    : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                }`}
+              >
+                <span aria-hidden="true">{f.emoji}</span>
+                {f.label}
+                <span className={`${active ? 'text-gray-300 dark:text-gray-500' : 'text-gray-400'}`}>
+                  {typeCounts[f.key] ?? 0}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="shrink-0 ml-auto">
+          <button
+            type="button"
+            onClick={() => setFiltersOpen((open) => !open)}
+            className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
+              filtersOpen || activeFilterCount > 0
+                ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900'
+                : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+            }`}
+          >
+            Filters
+            <span
+              className={`ml-2 ${
+                filtersOpen || activeFilterCount > 0 ? 'text-gray-300 dark:text-gray-500' : 'text-gray-400'
+              }`}
+            >
+              {filtered.length.toLocaleString()}
             </span>
-          )}
-        </button>
-        <span className="text-sm text-gray-500 dark:text-gray-400">
-          {filtered.length.toLocaleString()} result{filtered.length === 1 ? '' : 's'}
-        </span>
+          </button>
+        </div>
       </div>
 
       {filtersOpen && (
@@ -132,32 +160,6 @@ export default function Leaderboard({ waters }: { waters: WaterCard[] }) {
           />
         </div>
       )}
-
-      <div className="flex flex-wrap gap-2 mb-6">
-        {TYPE_FILTERS.map((f) => {
-          const active = typeFilter === f.key;
-          return (
-            <button
-              key={f.key}
-              type="button"
-              onClick={() => {
-                setTypeFilter(f.key);
-                resetPagination();
-              }}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                active
-                  ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900'
-                  : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-              }`}
-            >
-              {f.label}
-              <span className={`ml-2 ${active ? 'text-gray-300 dark:text-gray-500' : 'text-gray-400'}`}>
-                {typeCounts[f.key] ?? 0}
-              </span>
-            </button>
-          );
-        })}
-      </div>
 
       {filtered.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-6 py-12 text-center">
