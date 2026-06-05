@@ -2,17 +2,13 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import type { Water, IngredientsMap, ScoreBreakdownItem } from '@/types';
-import { getWater, ingredients, siteUrl, waterCards, waterFilterCards, waters } from '@/lib/data';
+import { getWater, ingredients, siteUrl, waterCards, waterFilterCards } from '@/lib/data';
 import Header from '@/components/Header';
 import ScoreCircle from '@/components/ScoreCircle';
 import { Metadata } from 'next';
 import { waterTypeLabel, titleize, microplasticsRisk } from '@/lib/format';
 
 const ingredientDetails = ingredients as IngredientsMap;
-
-export function generateStaticParams() {
-  return waters.map((w) => ({ id: w.id.toString() }));
-}
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;

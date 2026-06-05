@@ -3,12 +3,8 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Header from '@/components/Header';
-import { getIngredient, ingredientList, siteUrl, waterCards, waterFilterCards, waters } from '@/lib/data';
+import { getIngredient, siteUrl, waterCards, waterFilterCards, waters } from '@/lib/data';
 import { waterTypeLabel } from '@/lib/format';
-
-export function generateStaticParams() {
-  return ingredientList.map((ingredient) => ({ id: ingredient.id.toString() }));
-}
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;

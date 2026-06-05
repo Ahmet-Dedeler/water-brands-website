@@ -2,15 +2,11 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import type { ScoreBreakdownItem } from '@/types';
-import { getWaterFilter, siteUrl, waterCards, waterFilterCards, waterFilters } from '@/lib/data';
+import { getWaterFilter, siteUrl, waterCards, waterFilterCards } from '@/lib/data';
 import Header from '@/components/Header';
 import ScoreCircle from '@/components/ScoreCircle';
 import { Metadata } from 'next';
 import { filterTypeLabel, titleize } from '@/lib/format';
-
-export function generateStaticParams() {
-  return waterFilters.map((f) => ({ id: f.id.toString() }));
-}
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
