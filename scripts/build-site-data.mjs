@@ -62,6 +62,8 @@ const num = (...vals) => {
 };
 
 const referencedIngredientIds = new Set();
+/** Inline item rows when an id isn't in ingredients_referenced.json. */
+const inlineIngredientById = new Map();
 
 function capDescription(item) {
   const row = (item.score_breakdown || []).find((s) => s.id === 'cap_material');
@@ -98,6 +100,7 @@ const waters = items
       .map((ing) => {
         referencedIngredientIds.add(ing.ingredient_id);
         const ref = ingredientById.get(ing.ingredient_id);
+        if (!ref && ing.name) inlineIngredientById.set(ing.ingredient_id, ing);
         return {
           ingredient_id: ing.ingredient_id,
           amount: ing.amount ?? null,
@@ -152,10 +155,10 @@ const waters = items
 // Emit only the ingredient details we actually reference.
 const ingredientMap = {};
 for (const id of referencedIngredientIds) {
-  const ref = ingredientById.get(id);
+  const ref = ingredientById.get(id) ?? inlineIngredientById.get(id);
   if (!ref) continue;
   ingredientMap[id] = {
-    id: ref.id,
+    id: ref.id ?? ref.ingredient_id ?? id,
     name: ref.name ?? '',
     description: ref.description ?? null,
     category: ref.category ?? null,

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Header from '@/components/Header';
-import { waterCards, waterFilterCards } from '@/lib/data';
+import { ingredientSearchCards, waterCards, waterFilterCards } from '@/lib/data';
 
 export const metadata: Metadata = {
   title: 'How Water Filter Scores Work',
@@ -113,7 +113,7 @@ export default function WaterFilterScoringPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-[var(--surface-page)]">
-      <Header waters={waterCards} filters={waterFilterCards} />
+      <Header waters={waterCards} filters={waterFilterCards} ingredients={ingredientSearchCards} />
 
       <div className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 lg:px-8">
         <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import { siteUrl } from "@/lib/data";
+import { siteUrl, waterCards } from "@/lib/data";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
@@ -12,22 +12,22 @@ const emojiIcon = `data:image/svg+xml,${encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">${SITE_EMOJI}</text></svg>`
 )}`;
 
+const siteDescription = `Compare ${waterCards.length.toLocaleString()} bottled, sparkling and gallon waters ranked by lab-tested purity, source quality, packaging and contaminants.`;
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     default: "Water Brands Leaderboard",
     template: `%s | Water Brands Leaderboard`,
   },
-  description:
-    "Compare 1,900+ bottled, sparkling and gallon waters ranked by lab-tested purity, source quality, packaging and contaminants.",
+  description: siteDescription,
   icons: {
     icon: emojiIcon,
     apple: emojiIcon,
   },
   openGraph: {
     title: "Water Brands Leaderboard",
-    description:
-      "Compare 1,900+ bottled, sparkling and gallon waters ranked by lab-tested purity, source quality, packaging and contaminants.",
+    description: siteDescription,
     type: "website",
     locale: "en_US",
     siteName: "Water Brands Leaderboard",
@@ -35,8 +35,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Water Brands Leaderboard",
-    description:
-      "Compare 1,900+ bottled, sparkling and gallon waters ranked by lab-tested purity, source quality, packaging and contaminants.",
+    description: siteDescription,
   },
 };
 

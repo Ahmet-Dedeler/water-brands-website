@@ -125,6 +125,13 @@ export interface IngredientsMap {
   [id: string]: IngredientDetail;
 }
 
+export interface IngredientSearchCard {
+  id: number;
+  name: string;
+  category: string | null;
+  is_contaminant: boolean;
+}
+
 export type WaterFilterType =
   | 'filter'
   | 'sink_filter'
