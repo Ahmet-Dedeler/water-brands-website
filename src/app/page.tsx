@@ -3,7 +3,7 @@ import Header from '@/components/Header';
 import Leaderboard from '@/components/Leaderboard';
 
 export default function Home() {
-  const labTested = waterCards.filter((w) => w.hasLabReport).length;
+  const labTested = waterCards.filter((w) => w.hasLabTest).length;
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
@@ -20,7 +20,7 @@ export default function Home() {
           </p>
           <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 mt-6 text-sm text-gray-500 dark:text-gray-400">
             <span><strong className="text-gray-900 dark:text-gray-100">{waterCards.length.toLocaleString()}</strong> waters ranked</span>
-            <span><strong className="text-gray-900 dark:text-gray-100">{labTested.toLocaleString()}</strong> with lab reports</span>
+            <span><strong className="text-gray-900 dark:text-gray-100">{labTested.toLocaleString()}</strong> lab tested</span>
             <span><strong className="text-gray-900 dark:text-gray-100">100</strong>-point purity score</span>
           </div>
         </div>

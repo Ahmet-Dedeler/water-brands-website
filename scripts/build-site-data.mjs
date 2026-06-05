@@ -52,6 +52,29 @@ const num = (...vals) => {
 
 const referencedIngredientIds = new Set();
 
+function capDescription(item) {
+  const row = (item.score_breakdown || []).find((s) => s.id === 'cap_material');
+  return row?.description || item.cap_material || null;
+}
+
+function deriveCapSafety(item) {
+  const desc = String(capDescription(item) || '').toLowerCase();
+  if (desc.includes('leaching')) return 'high';
+
+  const lowCaps = ['aluminum_screw', 'smooth_metal_screw', 'cork', 'metal_twist_off'];
+  const rawCap = String(item.cap_material || '').toLowerCase();
+  if (lowCaps.some((cap) => desc.includes(cap) || rawCap === cap)) return 'low';
+  if (desc && desc !== 'unknown') return 'moderate';
+  return null;
+}
+
+function hasNoMicroplastics(item) {
+  const meta = item.metadata || {};
+  if (meta.certified_no_plastic === true || meta.certified_no_plastic === 'true') return true;
+  const packDesc = (item.score_breakdown || []).find((s) => s.id === 'packaging')?.description || '';
+  return packDesc.toLowerCase().includes('certified no plastic');
+}
+
 const waters = items
   .filter((item) => WATER_TYPES.has(item.type) && item.score !== null)
   .map((item) => {
@@ -89,6 +112,9 @@ const waters = items
       packaging: item.packaging ?? null,
       capMaterial: Array.isArray(capMaterial) ? capMaterial.join(', ') : capMaterial,
       waterSource: item.water_source ?? null,
+      hasLabTest: item.current_lab_id != null,
+      noMicroplastics: hasNoMicroplastics(item),
+      capSafety: deriveCapSafety(item),
       isDistilled: Boolean(item.is_distilled),
       filtrationMethods: item.filtration_methods ?? [],
       ph: num(meta.ph_level, meta.ph),
@@ -141,6 +167,9 @@ const cards = waters.map((w) => ({
   packaging: w.packaging,
   waterSource: w.waterSource,
   hasLabReport: w.scoreBreakdown.some((b) => b.id === 'lab_report' && b.score > 0),
+  hasLabTest: w.hasLabTest,
+  noMicroplastics: w.noMicroplastics,
+  capSafety: w.capSafety,
 }));
 
 writeFileSync(join(OUT, 'waters.json'), JSON.stringify(waters));

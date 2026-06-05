@@ -27,6 +27,28 @@ export interface Source {
   label: string;
 }
 
+export type CapSafety = 'low' | 'moderate' | 'high';
+
+export type PackagingFilter = 'plastic' | 'glass' | 'cardboard' | 'aluminum' | 'aluminum (can)';
+
+export type WaterSourceFilter =
+  | 'municipal_supply'
+  | 'mountain_spring'
+  | 'spring'
+  | 'well'
+  | 'aquifer'
+  | 'iceberg'
+  | 'rain'
+  | 'unknown';
+
+export interface WaterRankingFilters {
+  labTestedOnly: boolean;
+  noMicroplastics: boolean;
+  capSafety: CapSafety | null;
+  packaging: PackagingFilter | null;
+  waterSource: WaterSourceFilter | null;
+}
+
 export interface Water {
   id: number;
   name: string;
@@ -40,6 +62,9 @@ export interface Water {
   packaging: string | null;
   capMaterial: string | null;
   waterSource: string | null;
+  hasLabTest: boolean;
+  noMicroplastics: boolean;
+  capSafety: CapSafety | null;
   isDistilled: boolean;
   filtrationMethods: string[];
   ph: number | null;
@@ -65,7 +90,13 @@ export interface WaterCard {
   image: string | null;
   packaging: string | null;
   waterSource: string | null;
+  /** Lab report indexed in Oasis score breakdown. */
   hasLabReport: boolean;
+  /** Oasis “Lab tested only” — product has a linked lab (`current_lab_id`). */
+  hasLabTest: boolean;
+  /** Packaging certified no plastic (Oasis “No microplastics”). */
+  noMicroplastics: boolean;
+  capSafety: CapSafety | null;
 }
 
 export interface IngredientDetail {
