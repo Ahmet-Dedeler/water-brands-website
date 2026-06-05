@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint .",
     "scrape:oasis": "node scripts/scrape-oasis.mjs",
-    "build:data": "node scripts/build-site-data.mjs"
+    "build:data": "node scripts/build-site-data.mjs",
+    "import:oasis:supabase": "node scripts/import-oasis-to-supabase.mjs",
+    "import:oasis:tap-water": "node scripts/import-oasis-tap-water-to-supabase.mjs"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

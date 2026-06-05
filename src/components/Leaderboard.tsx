@@ -11,6 +11,7 @@ import {
   matchesRankingFilters,
 } from '@/lib/water-filters';
 import WaterFilters from '@/components/WaterFilters';
+import { pillActive, pillCountActive, pillCountInactive, pillInactive } from '@/lib/ui-classes';
 
 const PAGE_SIZE = 60;
 
@@ -38,7 +39,7 @@ function Card({ water, rank }: { water: WaterCard; rank: number }) {
   return (
     <Link
       href={`/water/${water.id}`}
-      className="group relative flex flex-col bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-200 overflow-hidden"
+      className="group relative flex flex-col bg-white dark:bg-[var(--surface-raised)] rounded-xl border border-gray-100 dark:border-[var(--border-soft)] shadow-sm hover:shadow-md hover:border-gray-200 dark:hover:border-gray-500 transition-all duration-200 overflow-hidden"
     >
       <div className="flex items-start gap-4 p-5">
         <span className="text-sm font-bold text-gray-300 dark:text-gray-600 w-7 shrink-0 pt-1 tabular-nums">#{rank}</span>
@@ -58,10 +59,10 @@ function Card({ water, rank }: { water: WaterCard; rank: number }) {
       <div className="mt-auto flex flex-wrap gap-2 px-5 pb-4 text-xs">
         <span className="px-2 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300">{waterTypeLabel(water.type)}</span>
         {water.packaging && (
-          <span className="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">{titleize(water.packaging)}</span>
+          <span className="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-[var(--surface-muted)] text-gray-600 dark:text-gray-300">{titleize(water.packaging)}</span>
         )}
         {water.waterSource && water.waterSource !== 'unknown' && (
-          <span className="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">{titleize(water.waterSource)}</span>
+          <span className="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-[var(--surface-muted)] text-gray-600 dark:text-gray-300">{titleize(water.waterSource)}</span>
         )}
       </div>
     </Link>
@@ -109,14 +110,12 @@ export default function Leaderboard({ waters }: { waters: WaterCard[] }) {
                   resetPagination();
                 }}
                 className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                  active
-                    ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900'
-                    : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                  active ? pillActive : pillInactive
                 }`}
               >
                 <span aria-hidden="true">{f.emoji}</span>
                 {f.label}
-                <span className={`${active ? 'text-gray-300 dark:text-gray-500' : 'text-gray-400'}`}>
+                <span className={active ? pillCountActive : pillCountInactive}>
                   {typeCounts[f.key] ?? 0}
                 </span>
               </button>
@@ -129,15 +128,13 @@ export default function Leaderboard({ waters }: { waters: WaterCard[] }) {
             type="button"
             onClick={() => setFiltersOpen((open) => !open)}
             className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
-              filtersOpen || activeFilterCount > 0
-                ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900'
-                : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+              filtersOpen || activeFilterCount > 0 ? pillActive : pillInactive
             }`}
           >
             Filters
             <span
               className={`ml-2 ${
-                filtersOpen || activeFilterCount > 0 ? 'text-gray-300 dark:text-gray-500' : 'text-gray-400'
+                filtersOpen || activeFilterCount > 0 ? pillCountActive : pillCountInactive
               }`}
             >
               {filtered.length.toLocaleString()}
@@ -163,7 +160,7 @@ export default function Leaderboard({ waters }: { waters: WaterCard[] }) {
       )}
 
       {filtered.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-6 py-12 text-center">
+        <div className="rounded-xl border border-dashed border-gray-200 dark:border-[var(--border-soft)] bg-white dark:bg-[var(--surface-raised)] px-6 py-12 text-center">
           <p className="text-gray-700 dark:text-gray-300 font-medium">No waters match these filters.</p>
           <button
             type="button"
@@ -190,7 +187,7 @@ export default function Leaderboard({ waters }: { waters: WaterCard[] }) {
           <button
             type="button"
             onClick={() => setVisible((v) => v + PAGE_SIZE)}
-            className="px-6 py-2.5 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm transition-all"
+            className="px-6 py-2.5 rounded-full bg-white dark:bg-[var(--surface-raised)] border border-gray-200 dark:border-[var(--border-soft)] text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500 hover:shadow-sm transition-all"
           >
             Show more ({filtered.length - visible} left)
           </button>

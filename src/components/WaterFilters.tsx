@@ -8,6 +8,7 @@ import {
   PACKAGING_OPTIONS,
   SOURCE_OPTIONS,
 } from '@/lib/water-filters';
+import { pillActive, pillInactive } from '@/lib/ui-classes';
 
 function FilterChip({
   active,
@@ -23,9 +24,7 @@ function FilterChip({
       type="button"
       onClick={onClick}
       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-        active
-          ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900'
-          : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+        active ? pillActive : pillInactive
       }`}
     >
       {children}
@@ -84,7 +83,7 @@ export default function WaterFilters({
   const hasActive = JSON.stringify(value) !== JSON.stringify(EMPTY_FILTERS);
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 space-y-5">
+    <div className="rounded-xl border border-gray-200 dark:border-[var(--border-soft)] bg-white dark:bg-[var(--surface-raised)] p-5 space-y-5">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
           Filters

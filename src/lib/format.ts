@@ -1,6 +1,6 @@
 // Human-readable labels and small derivations shared across the UI.
 
-import type { WaterType } from '@/types';
+import type { WaterFilterType, WaterType } from '@/types';
 
 const TYPE_LABELS: Record<WaterType, string> = {
   bottled_water: 'Still',
@@ -8,6 +8,14 @@ const TYPE_LABELS: Record<WaterType, string> = {
   water_gallon: 'Gallon',
   flavored_water: 'Flavored',
   hydrogen_water: 'Hydrogen',
+};
+
+const FILTER_TYPE_LABELS: Record<WaterFilterType, string> = {
+  filter: 'Water filter',
+  sink_filter: 'Sink filter',
+  shower_filter: 'Shower filter',
+  bottle_filter: 'Water bottle filter',
+  home_filter: 'Home filter',
 };
 
 export const waterTypeLabel = (type: WaterType): string => TYPE_LABELS[type] ?? type;
@@ -19,6 +27,8 @@ export const titleize = (value: string | null | undefined): string => {
     .replace(/_/g, ' ')
     .replace(/\b\w/g, (c) => c.toUpperCase());
 };
+
+export const filterTypeLabel = (type: WaterFilterType): string => FILTER_TYPE_LABELS[type] ?? titleize(type);
 
 // Score tier drives the accent color across cards, circles and badges.
 export type ScoreTier = 'great' | 'good' | 'ok' | 'poor';

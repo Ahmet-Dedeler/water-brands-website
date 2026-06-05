@@ -39,6 +39,7 @@ const readJsonIfPresent = (name, fallback) => {
 
 const verifiedItems = readJson('items_verified.json');
 const items = readJsonIfPresent('items_water_all.json', verifiedItems);
+const rawWaterFilters = readJsonIfPresent('water_filters.json', []);
 const brands = readJson('brands_referenced.json');
 const companies = readJson('companies_referenced.json');
 const ingredients = readJson('ingredients_referenced.json');
@@ -192,15 +193,80 @@ const cards = waters.map((w) => ({
   capSafety: w.capSafety,
 }));
 
+const waterFilters = rawWaterFilters
+  .filter((item) => item.score !== null)
+  .map((item) => {
+    const brand = brandById.get(item.brand);
+    const company = companyById.get(item.company);
+
+    return {
+      id: item.id,
+      name: item.name,
+      type: item.type ?? 'filter',
+      score: item.score,
+      brandName: brand?.name ?? null,
+      companyName: company?.name ?? null,
+      description: item.description ?? null,
+      image: pickImage(item),
+      rawImage: item.image ?? null,
+      technologies: item.technologies ?? [],
+      certifications: item.certifications ?? [],
+      filteredContaminantCategories: (item.filtered_contaminant_categories ?? []).map((c) => ({
+        category: c.category ?? '',
+        percentage: c.percentage ?? null,
+        status: c.status ?? null,
+      })),
+      tags: item.tags ?? null,
+      price: item.price ?? null,
+      lifeSpan: item.life_span ?? null,
+      hasLabTest: item.current_lab_id != null,
+      affiliateUrl: item.affiliate_url ?? null,
+      views: item.views ?? 0,
+      scoreBreakdown: (item.score_breakdown || []).map((b, idx) => ({
+        id: b.id ?? (b.category ? b.category.toLowerCase().replace(/[^a-z0-9]+/g, '_') : `item_${idx}`),
+        label: b.label ?? b.category ?? b.id ?? `Score item ${idx + 1}`,
+        score: b.score ?? 0,
+        max: b.max ?? b.weight ?? null,
+        description:
+          b.description ??
+          (b.effectiveness != null ? `${b.effectiveness}% removal effectiveness` : null),
+      })),
+      sources: (item.sources || []).filter((s) => s && s.url),
+    };
+  })
+  .sort((a, b) => b.score - a.score || b.views - a.views);
+
+const filterCards = waterFilters.map((f) => ({
+  id: f.id,
+  name: f.name,
+  type: f.type,
+  score: f.score,
+  brandName: f.brandName,
+  image: f.image,
+  technologies: f.technologies.slice(0, 3),
+  hasLabTest: f.hasLabTest,
+  certificationCount: f.certifications.length,
+  categoryCount: f.filteredContaminantCategories.length,
+}));
+
 writeFileSync(join(OUT, 'waters.json'), JSON.stringify(waters));
 writeFileSync(join(OUT, 'water-cards.json'), JSON.stringify(cards));
 writeFileSync(join(OUT, 'ingredients.json'), JSON.stringify(ingredientMap));
+writeFileSync(join(OUT, 'water-filters.json'), JSON.stringify(waterFilters));
+writeFileSync(join(OUT, 'water-filter-cards.json'), JSON.stringify(filterCards));
 
 const byType = waters.reduce((acc, w) => {
   acc[w.type] = (acc[w.type] || 0) + 1;
+  return acc;
+}, {});
+const filterByType = waterFilters.reduce((acc, f) => {
+  acc[f.type] = (acc[f.type] || 0) + 1;
   return acc;
 }, {});
 console.log(`Wrote ${waters.length} waters to src/data/waters.json`);
 console.log(`Wrote ${cards.length} cards to src/data/water-cards.json`);
 console.log('  by type:', byType);
 console.log(`Wrote ${Object.keys(ingredientMap).length} ingredients to src/data/ingredients.json`);
+console.log(`Wrote ${waterFilters.length} filters to src/data/water-filters.json`);
+console.log(`Wrote ${filterCards.length} filter cards to src/data/water-filter-cards.json`);
+console.log('  filter types:', filterByType);

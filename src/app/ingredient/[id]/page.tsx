@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Header from '@/components/Header';
-import { getIngredient, ingredientList, siteUrl, waterCards, waters } from '@/lib/data';
+import { getIngredient, ingredientList, siteUrl, waterCards, waterFilterCards, waters } from '@/lib/data';
 import { waterTypeLabel } from '@/lib/format';
 
 export function generateStaticParams() {
@@ -63,7 +63,7 @@ function formatDate(value: string | null) {
 
 function InfoBlock({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
+    <section className="rounded-xl border border-gray-200 dark:border-[var(--border-soft)] bg-white dark:bg-[var(--surface-raised)] p-5">
       <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{title}</h2>
       <div className="mt-3 text-gray-700 dark:text-gray-300 leading-relaxed">{children}</div>
     </section>
@@ -120,20 +120,20 @@ export default async function IngredientPage({ params }: { params: Promise<{ id:
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <main className="min-h-screen bg-gray-50 dark:bg-[var(--surface-page)]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Header waters={waterCards} />
+      <Header waters={waterCards} filters={waterFilterCards} />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <Link href="/" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4 inline-block">
           &larr; Back to all waters
         </Link>
 
-        <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
+        <div className="rounded-2xl border border-gray-200 dark:border-[var(--border-soft)] bg-white dark:bg-[var(--surface-raised)] shadow-sm overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-8 p-6 md:p-8">
-            <div className="relative flex h-60 items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-800/50 p-4">
+            <div className="relative flex h-60 items-center justify-center rounded-xl bg-gray-50 dark:bg-[var(--surface-muted)]/50 p-4">
               {ingredient.image ? (
                 <Image
                   src={ingredient.image}
@@ -173,7 +173,7 @@ export default async function IngredientPage({ params }: { params: Promise<{ id:
                   {ingredient.is_contaminant ? 'Tracked contaminant' : 'Mineral or nutrient'}
                 </span>
                 {updated && (
-                  <span className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                  <span className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600 dark:bg-[var(--surface-muted)] dark:text-gray-300">
                     Updated {updated}
                   </span>
                 )}
@@ -181,7 +181,7 @@ export default async function IngredientPage({ params }: { params: Promise<{ id:
             </div>
           </div>
 
-          <div className="border-t border-gray-100 dark:border-gray-800 p-6 md:p-8">
+          <div className="border-t border-gray-100 dark:border-[var(--border-soft)] p-6 md:p-8">
             <ScoreMeter score={score} />
           </div>
         </div>
@@ -231,7 +231,7 @@ export default async function IngredientPage({ params }: { params: Promise<{ id:
         </div>
 
         {ingredient.sources.length > 0 && (
-          <section className="mt-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
+          <section className="mt-6 rounded-xl border border-gray-200 dark:border-[var(--border-soft)] bg-white dark:bg-[var(--surface-raised)] p-5">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">References</h2>
             <ul className="mt-3 space-y-2">
               {ingredient.sources.map((source, index) => (
@@ -265,7 +265,7 @@ export default async function IngredientPage({ params }: { params: Promise<{ id:
                 <Link
                   key={water.id}
                   href={`/water/${water.id}`}
-                  className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:border-gray-300 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700"
+                  className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:border-gray-300 hover:shadow-md dark:border-[var(--border-soft)] dark:bg-[var(--surface-raised)] dark:hover:border-gray-500"
                 >
                   <div className="flex items-start gap-3">
                     <div className="relative h-14 w-14 shrink-0">
@@ -281,7 +281,7 @@ export default async function IngredientPage({ params }: { params: Promise<{ id:
                       <h3 className="line-clamp-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{water.name}</h3>
                       <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{waterTypeLabel(water.type)}</p>
                     </div>
-                    <span className="rounded-full bg-gray-100 px-2 py-1 text-sm font-bold tabular-nums text-gray-900 dark:bg-gray-800 dark:text-gray-100">
+                    <span className="rounded-full bg-gray-100 px-2 py-1 text-sm font-bold tabular-nums text-gray-900 dark:bg-[var(--surface-muted)] dark:text-gray-100">
                       {water.score}
                     </span>
                   </div>

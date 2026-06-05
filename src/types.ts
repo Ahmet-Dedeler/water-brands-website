@@ -124,3 +124,52 @@ export interface IngredientDetail {
 export interface IngredientsMap {
   [id: string]: IngredientDetail;
 }
+
+export type WaterFilterType =
+  | 'filter'
+  | 'sink_filter'
+  | 'shower_filter'
+  | 'bottle_filter'
+  | 'home_filter';
+
+export interface FilteredContaminantCategory {
+  category: string;
+  percentage: number | null;
+  status: string | null;
+}
+
+export interface WaterFilter {
+  id: number;
+  name: string;
+  type: WaterFilterType;
+  score: number;
+  brandName: string | null;
+  companyName: string | null;
+  description: string | null;
+  image: string | null;
+  rawImage: string | null;
+  technologies: string[];
+  certifications: string[];
+  filteredContaminantCategories: FilteredContaminantCategory[];
+  tags: string | null;
+  price: number | null;
+  lifeSpan: string | null;
+  hasLabTest: boolean;
+  affiliateUrl: string | null;
+  views: number;
+  scoreBreakdown: ScoreBreakdownItem[];
+  sources: Source[];
+}
+
+export interface WaterFilterCard {
+  id: number;
+  name: string;
+  type: WaterFilterType;
+  score: number;
+  brandName: string | null;
+  image: string | null;
+  technologies: string[];
+  hasLabTest: boolean;
+  certificationCount: number;
+  categoryCount: number;
+}

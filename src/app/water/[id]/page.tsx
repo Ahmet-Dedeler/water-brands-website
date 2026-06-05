@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import type { Water, IngredientsMap, ScoreBreakdownItem } from '@/types';
-import { getWater, ingredients, siteUrl, waterCards, waters } from '@/lib/data';
+import { getWater, ingredients, siteUrl, waterCards, waterFilterCards, waters } from '@/lib/data';
 import Header from '@/components/Header';
 import ScoreCircle from '@/components/ScoreCircle';
 import { Metadata } from 'next';
@@ -90,7 +90,7 @@ function ScoreBar({ item }: { item: ScoreBreakdownItem }) {
           {item.max != null && <span className="text-gray-400 dark:text-gray-500">/{item.max}</span>}
         </span>
       </div>
-      <div className="h-1.5 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+      <div className="h-1.5 rounded-full bg-gray-100 dark:bg-[var(--surface-muted)] overflow-hidden">
         <div className="h-full rounded-full bg-sky-500" style={{ width: `${pct}%` }} />
       </div>
     </li>
@@ -133,20 +133,20 @@ export default async function WaterDetailsPage({ params }: { params: Promise<{ i
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <main className="min-h-screen bg-gray-50 dark:bg-[var(--surface-page)]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Header waters={waterCards} />
+      <Header waters={waterCards} filters={waterFilterCards} />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <Link href="/" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4 inline-block">
           &larr; Back to all waters
         </Link>
 
-        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-[var(--surface-raised)] border border-gray-200 dark:border-[var(--border-soft)] rounded-2xl shadow-sm overflow-hidden">
           <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="relative flex items-center justify-center bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 h-56">
+            <div className="relative flex items-center justify-center bg-gray-50 dark:bg-[var(--surface-muted)]/50 rounded-xl p-4 h-56">
               {water.image ? (
                 <Image
                   src={water.image}
@@ -178,7 +178,7 @@ export default async function WaterDetailsPage({ params }: { params: Promise<{ i
               {chips.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-5">
                   {chips.map((c) => (
-                    <span key={c} className="px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs">
+                    <span key={c} className="px-2.5 py-1 rounded-full bg-gray-100 dark:bg-[var(--surface-muted)] text-gray-600 dark:text-gray-300 text-xs">
                       {c}
                     </span>
                   ))}
@@ -187,7 +187,7 @@ export default async function WaterDetailsPage({ params }: { params: Promise<{ i
             </div>
           </div>
 
-          <dl className="border-t border-gray-100 dark:border-gray-800 grid grid-cols-2 md:grid-cols-4 divide-x divide-y divide-gray-100 dark:divide-gray-800">
+          <dl className="border-t border-gray-100 dark:border-[var(--border-soft)] grid grid-cols-2 md:grid-cols-4 divide-x divide-y divide-gray-100 dark:divide-gray-800">
             <Stat label="Lab Tested" value={labTested ? 'Yes' : 'No'} tone={labTested ? 'good' : 'bad'} />
             <Stat label="Contaminants" value={contaminants.length} tone={contaminants.length ? 'bad' : 'good'} />
             <Stat label="Minerals" value={nutrients.length} />

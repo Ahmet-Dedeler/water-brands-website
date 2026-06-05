@@ -1,6 +1,21 @@
 @import "tailwindcss";
 
 @layer base {
+  :root {
+    --surface-page: #fcfcf9;
+    --surface-raised: #ffffff;
+    --surface-muted: #f4f6f8;
+    --border-soft: #e5e7eb;
+  }
+
+  .dark {
+    /* Soft blue-slate — cozy dark mode, not pitch black */
+    --surface-page: #1e2938;
+    --surface-raised: #2d3a4f;
+    --surface-muted: #38465c;
+    --border-soft: #4a5a72;
+  }
+
   html {
     color-scheme: light dark;
     /* Slightly larger default UI — matches ~110% browser zoom feel at 100%. */
@@ -8,6 +23,7 @@
   }
 
   body {
-    @apply bg-[#FCFCF9] text-gray-900 dark:bg-gray-950 dark:text-gray-100;
+    background-color: var(--surface-page);
+    @apply text-gray-900 dark:text-gray-100;
   }
 }
