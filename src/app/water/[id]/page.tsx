@@ -5,6 +5,7 @@ import type { Water, IngredientsMap, ScoreBreakdownItem } from '@/types';
 import { getLab, getWater, ingredients, siteUrl } from '@/lib/data';
 import Header from '@/components/Header';
 import ScoreCircle from '@/components/ScoreCircle';
+import ScoreBarAnimated from '@/components/ScoreBarAnimated';
 import { Metadata } from 'next';
 import { waterTypeLabel, titleize, microplasticsRisk } from '@/lib/format';
 import LabReportsSection from '@/components/LabReportsSection';
@@ -61,37 +62,7 @@ function Stat({ label, value, tone = 'default' }: { label: string; value: React.
 }
 
 function ScoreBar({ item }: { item: ScoreBreakdownItem }) {
-  const isPenalty = item.id.endsWith('_penalty') || item.score < 0;
-  if (isPenalty) {
-    return (
-      <li className="flex items-center justify-between py-2.5">
-        <span className="text-sm text-gray-700 dark:text-gray-300">
-          {item.label}
-          {item.description && <span className="text-gray-400 dark:text-gray-500"> · {titleize(item.description)}</span>}
-        </span>
-        <span className="text-sm font-semibold text-rose-600 dark:text-rose-400 tabular-nums">{item.score}</span>
-      </li>
-    );
-  }
-  const max = item.max ?? Math.max(item.score, 1);
-  const pct = Math.max(0, Math.min(100, (item.score / max) * 100));
-  return (
-    <li className="py-2.5">
-      <div className="flex items-center justify-between mb-1.5">
-        <span className="text-sm text-gray-700 dark:text-gray-300">
-          {item.label}
-          {item.description && <span className="text-gray-400 dark:text-gray-500"> · {titleize(item.description)}</span>}
-        </span>
-        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 tabular-nums">
-          {item.score}
-          {item.max != null && <span className="text-gray-400 dark:text-gray-500">/{item.max}</span>}
-        </span>
-      </div>
-      <div className="h-1.5 rounded-full bg-gray-100 dark:bg-[var(--surface-muted)] overflow-hidden">
-        <div className="h-full rounded-full bg-sky-500" style={{ width: `${pct}%` }} />
-      </div>
-    </li>
-  );
+  return <ScoreBarAnimated item={item} />;
 }
 
 export default async function WaterDetailsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -138,7 +109,7 @@ export default async function WaterDetailsPage({ params }: { params: Promise<{ i
       />
       <Header />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <Link href="/" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4 inline-block">
+        <Link href="/" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4 inline-block link-back">
           &larr; Back to all waters
         </Link>
 
@@ -244,26 +215,27 @@ export default async function WaterDetailsPage({ params }: { params: Promise<{ i
               <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3">Contaminants</h2>
               <ul className="space-y-3">
                 {contaminants.map((item, index) => (
-                  <li key={index} className="p-4 bg-rose-50 dark:bg-rose-950/30 border-l-4 border-rose-500 rounded-r-lg">
-                    <div className="flex justify-between items-baseline gap-3">
-                      <h3 className="font-semibold text-rose-900 dark:text-rose-200">
-                        <Link href={`/ingredient/${item.ingredient_id}`} className="hover:underline">
-                          {item.name}
-                        </Link>
-                      </h3>
-                      {item.amount != null && (
-                        <span className="text-sm font-medium text-rose-600 dark:text-rose-400 whitespace-nowrap">
-                          {item.amount} {item.measure}
-                        </span>
+                  <li key={index}>
+                    <Link
+                      href={`/ingredient/${item.ingredient_id}`}
+                      className="ingredient-card block p-4 bg-rose-50 dark:bg-rose-950/30 border-l-4 border-rose-500 rounded-r-lg hover:bg-rose-100/90 dark:hover:bg-rose-950/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 motion-reduce:transform-none"
+                    >
+                      <div className="flex justify-between items-baseline gap-3">
+                        <h3 className="font-semibold text-rose-900 dark:text-rose-200">{item.name}</h3>
+                        {item.amount != null && (
+                          <span className="text-sm font-medium text-rose-600 dark:text-rose-400 whitespace-nowrap">
+                            {item.amount} {item.measure}
+                          </span>
+                        )}
+                      </div>
+                      {item.risks && <p className="text-sm text-rose-800/90 dark:text-rose-300/90 mt-1">{item.risks}</p>}
+                      {(item.legal_limit != null || item.health_guideline != null) && (
+                        <p className="text-xs text-rose-500 dark:text-rose-400 mt-1.5">
+                          {item.legal_limit != null && <>Legal limit: {item.legal_limit} </>}
+                          {item.health_guideline != null && <>· Health guideline: {item.health_guideline}</>}
+                        </p>
                       )}
-                    </div>
-                    {item.risks && <p className="text-sm text-rose-800/90 dark:text-rose-300/90 mt-1">{item.risks}</p>}
-                    {(item.legal_limit != null || item.health_guideline != null) && (
-                      <p className="text-xs text-rose-500 dark:text-rose-400 mt-1.5">
-                        {item.legal_limit != null && <>Legal limit: {item.legal_limit} </>}
-                        {item.health_guideline != null && <>· Health guideline: {item.health_guideline}</>}
-                      </p>
-                    )}
+                    </Link>
                   </li>
                 ))}
                 {contaminants.length === 0 && (
@@ -276,22 +248,23 @@ export default async function WaterDetailsPage({ params }: { params: Promise<{ i
               <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3">Minerals & nutrients</h2>
               <ul className="space-y-3">
                 {nutrients.map((item, index) => (
-                  <li key={index} className="p-4 bg-emerald-50 dark:bg-emerald-950/30 border-l-4 border-emerald-500 rounded-r-lg">
-                    <div className="flex justify-between items-baseline gap-3">
-                      <h3 className="font-semibold text-emerald-900 dark:text-emerald-200">
-                        <Link href={`/ingredient/${item.ingredient_id}`} className="hover:underline">
-                          {item.name}
-                        </Link>
-                      </h3>
-                      {item.amount != null && (
-                        <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400 whitespace-nowrap">
-                          {item.amount} {item.measure}
-                        </span>
+                  <li key={index}>
+                    <Link
+                      href={`/ingredient/${item.ingredient_id}`}
+                      className="ingredient-card block p-4 bg-emerald-50 dark:bg-emerald-950/30 border-l-4 border-emerald-500 rounded-r-lg hover:bg-emerald-100/90 dark:hover:bg-emerald-950/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 motion-reduce:transform-none"
+                    >
+                      <div className="flex justify-between items-baseline gap-3">
+                        <h3 className="font-semibold text-emerald-900 dark:text-emerald-200">{item.name}</h3>
+                        {item.amount != null && (
+                          <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400 whitespace-nowrap">
+                            {item.amount} {item.measure}
+                          </span>
+                        )}
+                      </div>
+                      {item.benefits && item.benefits !== 'None' && (
+                        <p className="text-sm text-emerald-800/90 dark:text-emerald-300/90 mt-1">{item.benefits}</p>
                       )}
-                    </div>
-                    {item.benefits && item.benefits !== 'None' && (
-                      <p className="text-sm text-emerald-800/90 dark:text-emerald-300/90 mt-1">{item.benefits}</p>
-                    )}
+                    </Link>
                   </li>
                 ))}
                 {nutrients.length === 0 && <p className="text-sm text-gray-500 dark:text-gray-400">No minerals listed.</p>}

@@ -5,7 +5,16 @@ import Image from 'next/image';
 import { useMemo, useState } from 'react';
 import type { WaterFilterCard, WaterFilterType } from '@/types';
 import { scoreTier, SCORE_COLORS, filterTypeLabel } from '@/lib/format';
-import { pillActive, pillCountActive, pillCountInactive, pillInactive } from '@/lib/ui-classes';
+import EmptyState from '@/components/motion/EmptyState';
+import {
+  btnSecondary,
+  cardLink,
+  pillActive,
+  pillButton,
+  pillCountActive,
+  pillCountInactive,
+  pillInactive,
+} from '@/lib/ui-classes';
 
 const PAGE_SIZE = 60;
 
@@ -30,13 +39,10 @@ function ScoreBadge({ score }: { score: number }) {
 
 function Card({ filter, rank }: { filter: WaterFilterCard; rank: number }) {
   return (
-    <Link
-      href={`/filter/${filter.id}`}
-      className="group relative flex flex-col bg-white dark:bg-[var(--surface-raised)] rounded-xl border border-gray-100 dark:border-[var(--border-soft)] shadow-sm hover:shadow-md hover:border-gray-200 dark:hover:border-gray-500 transition-all duration-200 overflow-hidden"
-    >
+    <Link href={`/filter/${filter.id}`} className={cardLink}>
       <div className="flex items-start gap-4 p-5">
         <span className="text-sm font-bold text-gray-300 dark:text-gray-600 w-7 shrink-0 pt-1 tabular-nums">#{rank}</span>
-        <div className="relative w-16 h-16 shrink-0">
+        <div className="relative w-16 h-16 shrink-0 overflow-hidden rounded-lg">
           {filter.image ? (
             <Image src={filter.image} alt="" fill sizes="64px" className="object-contain" loading="lazy" />
           ) : (
@@ -94,9 +100,7 @@ export default function FilterLeaderboard({ filters }: { filters: WaterFilterCar
                 setTypeFilter(f.key);
                 setVisible(PAGE_SIZE);
               }}
-              className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                active ? pillActive : pillInactive
-              }`}
+              className={`${pillButton} ${active ? pillActive : pillInactive}`}
             >
               <span aria-hidden="true">{f.emoji}</span>
               {f.label}
@@ -109,8 +113,7 @@ export default function FilterLeaderboard({ filters }: { filters: WaterFilterCar
       </div>
 
       {filtered.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-200 dark:border-[var(--border-soft)] bg-white dark:bg-[var(--surface-raised)] px-6 py-12 text-center">
-          <p className="text-gray-700 dark:text-gray-300 font-medium">No water filters match this category.</p>
+        <EmptyState icon="🫖" title="No water filters match this category.">
           <button
             type="button"
             onClick={() => {
@@ -121,7 +124,7 @@ export default function FilterLeaderboard({ filters }: { filters: WaterFilterCar
           >
             Show all water filters
           </button>
-        </div>
+        </EmptyState>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {shown.map((filter, i) => (
@@ -132,11 +135,7 @@ export default function FilterLeaderboard({ filters }: { filters: WaterFilterCar
 
       {visible < filtered.length && (
         <div className="text-center mt-8">
-          <button
-            type="button"
-            onClick={() => setVisible((v) => v + PAGE_SIZE)}
-            className="px-6 py-2.5 rounded-full bg-white dark:bg-[var(--surface-raised)] border border-gray-200 dark:border-[var(--border-soft)] text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500 hover:shadow-sm transition-all"
-          >
+          <button type="button" onClick={() => setVisible((v) => v + PAGE_SIZE)} className={btnSecondary}>
             Show more ({filtered.length - visible} left)
           </button>
         </div>

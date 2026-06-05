@@ -3,7 +3,17 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import type { IngredientSearchCard } from '@/types';
-import { pillActive, pillCountActive, pillCountInactive, pillInactive } from '@/lib/ui-classes';
+import EmptyState from '@/components/motion/EmptyState';
+import {
+  btnPrimary,
+  cardLinkRow,
+  inputField,
+  pillActive,
+  pillButton,
+  pillCountActive,
+  pillCountInactive,
+  pillInactive,
+} from '@/lib/ui-classes';
 
 const PAGE_SIZE = 80;
 
@@ -11,10 +21,7 @@ type Tab = 'all' | 'contaminants' | 'minerals';
 
 function Card({ ingredient, rank }: { ingredient: IngredientSearchCard; rank: number }) {
   return (
-    <Link
-      href={`/ingredient/${ingredient.id}`}
-      className="flex items-center gap-4 p-4 bg-white dark:bg-[var(--surface-raised)] rounded-xl border border-gray-100 dark:border-[var(--border-soft)] shadow-sm hover:shadow-md hover:border-gray-200 dark:hover:border-gray-500 transition-all"
-    >
+    <Link href={`/ingredient/${ingredient.id}`} className={cardLinkRow}>
       <span className="text-sm font-bold text-gray-300 dark:text-gray-600 w-7 shrink-0 tabular-nums">#{rank}</span>
       <span className="text-xl shrink-0" aria-hidden="true">
         {ingredient.is_contaminant ? '⚠️' : '✨'}
@@ -77,7 +84,7 @@ export default function IngredientLeaderboard({ ingredients }: { ingredients: In
               setTab(item.key);
               setVisible(PAGE_SIZE);
             }}
-            className={tab === item.key ? pillActive : pillInactive}
+            className={`${pillButton} ${tab === item.key ? pillActive : pillInactive}`}
           >
             {item.label}
             <span className={tab === item.key ? pillCountActive : pillCountInactive}>{item.count}</span>
@@ -98,27 +105,23 @@ export default function IngredientLeaderboard({ ingredients }: { ingredients: In
             setVisible(PAGE_SIZE);
           }}
           placeholder="Search by name or category…"
-          className="w-full px-4 py-3 text-sm bg-white dark:bg-[var(--surface-raised)] text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 border border-gray-200 dark:border-[var(--border-soft)] rounded-xl focus:ring-2 focus:ring-sky-300 dark:focus:ring-sky-500 focus:outline-none"
+          className={`w-full px-4 py-3 text-sm bg-white dark:bg-[var(--surface-raised)] text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 border border-gray-200 dark:border-[var(--border-soft)] rounded-xl ${inputField}`}
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {shown.map((ingredient, index) => (
-          <Card key={ingredient.id} ingredient={ingredient} rank={index + 1} />
-        ))}
-      </div>
-
-      {filtered.length === 0 && (
-        <p className="text-center text-gray-500 dark:text-gray-400 py-12">No ingredients match your search.</p>
+      {filtered.length === 0 ? (
+        <EmptyState icon="🧪" title="No ingredients match your search." />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {shown.map((ingredient, index) => (
+            <Card key={ingredient.id} ingredient={ingredient} rank={index + 1} />
+          ))}
+        </div>
       )}
 
       {visible < filtered.length && (
         <div className="text-center mt-8">
-          <button
-            type="button"
-            onClick={() => setVisible((v) => v + PAGE_SIZE)}
-            className="px-6 py-2.5 rounded-full bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium hover:opacity-90 transition-opacity"
-          >
+          <button type="button" onClick={() => setVisible((v) => v + PAGE_SIZE)} className={btnPrimary}>
             Load more
           </button>
         </div>

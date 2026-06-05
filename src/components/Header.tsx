@@ -6,7 +6,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import type { TapWaterSearchEntry } from '@/types';
 import { searchFilters, searchIngredients, searchWaters } from '@/lib/search';
 import { waterTypeLabel, filterTypeLabel } from '@/lib/format';
-import { pillActive, pillInactive } from '@/lib/ui-classes';
+import { pillActive, pillButton, pillInactive, inputField, motionPress } from '@/lib/ui-classes';
 
 type Section = 'drinks' | 'filter' | 'tap-water' | 'scoring' | 'ingredient';
 
@@ -26,6 +26,7 @@ export default function Header() {
 
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [tapLocations, setTapLocations] = useState<TapWaterSearchEntry[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
 
@@ -127,19 +128,26 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 8);
+    }
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   const navLinkClass = (active: boolean) =>
-    `inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-      active ? pillActive : `${pillInactive} border-transparent dark:border-transparent`
-    }`;
+    `${pillButton} ${active ? pillActive : `${pillInactive} border-transparent dark:border-transparent`}`;
 
   return (
-    <header className="sticky top-0 z-20 bg-white/85 dark:bg-[var(--surface-page)]/90 backdrop-blur border-b border-gray-100 dark:border-[var(--border-soft)] mb-8">
+    <header className={`sticky top-0 z-20 bg-white/85 dark:bg-[var(--surface-page)]/90 backdrop-blur border-b border-gray-100 dark:border-[var(--border-soft)] mb-8 transition-shadow duration-200 ${scrolled ? 'header-scrolled' : ''}`}>
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex flex-col gap-3 py-3 lg:flex-row lg:items-center lg:gap-4">
           {/* Logo + nav share one row on small screens (justify-between); at lg
               the wrapper dissolves so all three items sit on a single bar. */}
           <div className="flex items-center justify-between gap-2 lg:contents">
-            <Link href="/" className="flex items-center gap-2 font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap shrink-0">
+            <Link href="/" className={`flex items-center gap-2 font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap shrink-0 ${motionPress}`}>
               <span className="text-xl">🚰</span>
               <span className="hidden sm:inline">Water Leaderboard</span>
             </Link>
@@ -179,7 +187,7 @@ export default function Header() {
                 aria-label={searchLabel}
                 aria-controls={results.length > 0 ? 'search-results' : undefined}
                 autoComplete="off"
-                className="w-full pl-10 pr-4 py-2 text-sm bg-gray-100 dark:bg-[var(--surface-muted)] text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 border border-transparent rounded-lg focus:bg-white dark:focus:bg-[var(--surface-raised)] focus:ring-2 focus:ring-sky-300 dark:focus:ring-sky-500 focus:outline-none"
+                className={`w-full pl-10 pr-4 py-2 text-sm bg-gray-100 dark:bg-[var(--surface-muted)] text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 border border-transparent rounded-lg focus:bg-white dark:focus:bg-[var(--surface-raised)] ${inputField}`}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onFocus={() => setIsFocused(true)}
@@ -195,7 +203,7 @@ export default function Header() {
                   id="search-results"
                   role="listbox"
                   aria-label="Search results"
-                  className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[var(--surface-raised)] border border-gray-200 dark:border-[var(--border-soft)] rounded-lg shadow-lg z-10 overflow-hidden"
+                  className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[var(--surface-raised)] border border-gray-200 dark:border-[var(--border-soft)] rounded-lg shadow-lg z-10 overflow-hidden animate-dropdown"
                 >
                   <ul className="divide-y divide-gray-100 dark:divide-gray-800">
                     {section === 'ingredient'
@@ -203,7 +211,7 @@ export default function Header() {
                           <li key={ingredient.id} role="option" aria-selected="false">
                             <Link
                               href={`/ingredient/${ingredient.id}`}
-                              className="flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-800"
+                              className="flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-800 search-result-item"
                               onClick={() => setIsFocused(false)}
                             >
                               <span className="w-8 h-8 mr-3 flex items-center justify-center text-gray-300" aria-hidden="true">
@@ -225,7 +233,7 @@ export default function Header() {
                             <li key={filter.id} role="option" aria-selected="false">
                               <Link
                                 href={`/filter/${filter.id}`}
-                                className="flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                className="flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-800 search-result-item"
                                 onClick={() => setIsFocused(false)}
                               >
                                 <span className="w-8 h-8 mr-3 flex items-center justify-center text-gray-300" aria-hidden="true">🫖</span>
@@ -242,7 +250,7 @@ export default function Header() {
                               <li key={location.id} role="option" aria-selected="false">
                                 <Link
                                   href={`/tap-water/${location.id}`}
-                                  className="flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                  className="flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-800 search-result-item"
                                   onClick={() => setIsFocused(false)}
                                 >
                                   <span className="w-8 h-8 mr-3 flex items-center justify-center text-gray-300" aria-hidden="true">🚰</span>
@@ -258,7 +266,7 @@ export default function Header() {
                               <li key={water.id} role="option" aria-selected="false">
                                 <Link
                                   href={`/water/${water.id}`}
-                                  className="flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                  className="flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-800 search-result-item"
                                   onClick={() => setIsFocused(false)}
                                 >
                                   <span className="w-8 h-8 mr-3 flex items-center justify-center text-gray-300" aria-hidden="true">💧</span>

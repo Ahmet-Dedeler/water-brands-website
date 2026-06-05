@@ -109,6 +109,7 @@ export interface TapWaterCard {
   id: number;
   name: string;
   score: number | null;
+  image: string | null;
   state: string | null;
   country: string | null;
   zipCode: string | null;

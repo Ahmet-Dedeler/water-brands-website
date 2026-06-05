@@ -90,6 +90,22 @@ Keep new UI consistent with what's already in the app.
 
 Category tabs, filter chips, and header nav use a **soft sky-blue active state** (`src/lib/ui-classes.ts`) — not black pills. Dark mode uses warm blue-slate surfaces (`--surface-page`, `--surface-raised` in `globals.css`) instead of near-black grays.
 
+### Motion & animations
+
+**Never use bottom-to-up entrance animations** — no `translateY` slide-ins, no content rising into view. That effect feels disorienting.
+
+Opacity-only entrance is OK on the home page and elsewhere:
+
+- Page fade on navigation (`template.tsx` → `.page-enter`)
+- Hero text stagger (`.page-hero`) — fade only
+- Card grid stagger on filter change (`.stagger-grid`) — fade only
+- "Show more" items (`.reveal-item`) — fade only
+- Search dropdown (`.animate-dropdown`) — fade only
+
+Interaction feedback is fine: button press scale, hover shadow/border/image zoom, collapsible expand, score ring/bar fill. Always respect `prefers-reduced-motion` (see `globals.css`).
+
+Shared classes: `globals.css` (motion tokens + entrance utilities), `src/lib/ui-classes.ts` (press/hover).
+
 ### Adding something new?
 
 1. Pick an emoji that a non-technical person would recognize in two seconds.

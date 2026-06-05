@@ -18,7 +18,7 @@ export default function Home() {
       <Header />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <div className="text-center mb-10">
+        <div className="page-hero text-center mb-10">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-100 mb-3">
             Water Brands Leaderboard
           </h1>

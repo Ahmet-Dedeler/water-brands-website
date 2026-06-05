@@ -175,6 +175,7 @@ function mapTapWaterCard(row) {
     id: row.id,
     name: row.name,
     score: row.score ?? null,
+    image: row.image ?? null,
     state: row.state ?? null,
     country: row.country ?? null,
     zipCode: row.zip_code ?? null,

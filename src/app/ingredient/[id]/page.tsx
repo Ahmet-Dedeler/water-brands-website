@@ -3,8 +3,10 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Header from '@/components/Header';
+import ScoreMeterAnimated from '@/components/motion/ScoreMeterAnimated';
 import { getIngredient, siteUrl, waters } from '@/lib/data';
 import { waterTypeLabel } from '@/lib/format';
+import { cardLink } from '@/lib/ui-classes';
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
@@ -33,20 +35,6 @@ function impactScore(severity: number, bonus: number) {
   return bonus - severity;
 }
 
-function scoreLabel(score: number) {
-  if (score <= -4) return 'Very bad';
-  if (score < 0) return 'Poor';
-  if (score === 0) return 'Okay';
-  if (score < 4) return 'Good';
-  return 'Very good';
-}
-
-function scoreTone(score: number) {
-  if (score < 0) return 'text-rose-600 dark:text-rose-400';
-  if (score > 0) return 'text-emerald-600 dark:text-emerald-400';
-  return 'text-gray-700 dark:text-gray-300';
-}
-
 function formatLimit(value: number | null, measure: string | null) {
   if (value == null) return 'Not specified';
   return `${value} ${measure || ''}`.trim();
@@ -63,34 +51,6 @@ function InfoBlock({ title, children }: { title: string; children: React.ReactNo
       <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{title}</h2>
       <div className="mt-3 text-gray-700 dark:text-gray-300 leading-relaxed">{children}</div>
     </section>
-  );
-}
-
-function ScoreMeter({ score }: { score: number }) {
-  const clamped = Math.max(-5, Math.min(5, score));
-  const pct = ((clamped + 5) / 10) * 100;
-
-  return (
-    <div>
-      <div className="flex items-baseline justify-between">
-        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Health score</span>
-        <span className={`text-3xl font-bold tabular-nums ${scoreTone(score)}`}>
-          {score > 0 ? '+' : ''}
-          {score.toFixed(1)}
-        </span>
-      </div>
-      <div className="relative mt-4 h-3 rounded-full bg-gradient-to-r from-rose-500 via-gray-200 to-emerald-500 dark:via-gray-700">
-        <span
-          className="absolute top-1/2 h-6 w-1.5 -translate-y-1/2 rounded-full bg-gray-950 dark:bg-white shadow"
-          style={{ left: `calc(${pct}% - 3px)` }}
-        />
-      </div>
-      <div className="mt-2 flex justify-between text-xs text-gray-400 dark:text-gray-500">
-        <span>-5</span>
-        <span>{scoreLabel(score)}</span>
-        <span>5</span>
-      </div>
-    </div>
   );
 }
 
@@ -123,7 +83,7 @@ export default async function IngredientPage({ params }: { params: Promise<{ id:
       />
       <Header />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <Link href="/" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4 inline-block">
+        <Link href="/" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4 inline-block link-back">
           &larr; Back to all waters
         </Link>
 
@@ -178,7 +138,7 @@ export default async function IngredientPage({ params }: { params: Promise<{ id:
           </div>
 
           <div className="border-t border-gray-100 dark:border-[var(--border-soft)] p-6 md:p-8">
-            <ScoreMeter score={score} />
+            <ScoreMeterAnimated score={score} />
           </div>
         </div>
 
@@ -261,7 +221,7 @@ export default async function IngredientPage({ params }: { params: Promise<{ id:
                 <Link
                   key={water.id}
                   href={`/water/${water.id}`}
-                  className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:border-gray-300 hover:shadow-md dark:border-[var(--border-soft)] dark:bg-[var(--surface-raised)] dark:hover:border-gray-500"
+                  className={`${cardLink} p-4`}
                 >
                   <div className="flex items-start gap-3">
                     <div className="relative h-14 w-14 shrink-0">

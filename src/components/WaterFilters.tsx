@@ -8,7 +8,7 @@ import {
   PACKAGING_OPTIONS,
   SOURCE_OPTIONS,
 } from '@/lib/water-filters';
-import { pillActive, pillInactive } from '@/lib/ui-classes';
+import { pillActive, pillInactive, motionPress } from '@/lib/ui-classes';
 
 function FilterChip({
   active,
@@ -23,7 +23,7 @@ function FilterChip({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium tab-indicator ${motionPress} ${
         active ? pillActive : pillInactive
       }`}
     >

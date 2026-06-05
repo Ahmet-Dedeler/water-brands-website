@@ -5,6 +5,7 @@ import type { ScoreBreakdownItem } from '@/types';
 import { getLab, getWaterFilter, siteUrl } from '@/lib/data';
 import Header from '@/components/Header';
 import ScoreCircle from '@/components/ScoreCircle';
+import ScoreBarAnimated from '@/components/ScoreBarAnimated';
 import { Metadata } from 'next';
 import { filterTypeLabel, titleize } from '@/lib/format';
 import LabReportsSection from '@/components/LabReportsSection';
@@ -48,37 +49,7 @@ function Stat({ label, value, tone = 'default' }: { label: string; value: React.
 }
 
 function ScoreBar({ item }: { item: ScoreBreakdownItem }) {
-  const isPenalty = item.id?.endsWith('_penalty') || item.score < 0;
-  if (isPenalty) {
-    return (
-      <li className="flex items-center justify-between py-2.5">
-        <span className="text-sm text-gray-700 dark:text-gray-300">
-          {item.label}
-          {item.description && <span className="text-gray-400 dark:text-gray-500"> · {titleize(item.description)}</span>}
-        </span>
-        <span className="text-sm font-semibold text-rose-600 dark:text-rose-400 tabular-nums">{item.score}</span>
-      </li>
-    );
-  }
-  const max = item.max ?? Math.max(item.score, 1);
-  const pct = Math.max(0, Math.min(100, (item.score / max) * 100));
-  return (
-    <li className="py-2.5">
-      <div className="flex items-center justify-between mb-1.5">
-        <span className="text-sm text-gray-700 dark:text-gray-300">
-          {item.label}
-          {item.description && <span className="text-gray-400 dark:text-gray-500"> · {titleize(item.description)}</span>}
-        </span>
-        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 tabular-nums">
-          {item.score}
-          {item.max != null && <span className="text-gray-400 dark:text-gray-500">/{item.max}</span>}
-        </span>
-      </div>
-      <div className="h-1.5 rounded-full bg-gray-100 dark:bg-[var(--surface-muted)] overflow-hidden">
-        <div className="h-full rounded-full bg-sky-500" style={{ width: `${pct}%` }} />
-      </div>
-    </li>
-  );
+  return <ScoreBarAnimated item={item} />;
 }
 
 export default async function FilterDetailsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -117,7 +88,7 @@ export default async function FilterDetailsPage({ params }: { params: Promise<{ 
       />
       <Header />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <Link href="/filter" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4 inline-block">
+        <Link href="/filter" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4 inline-block link-back">
           &larr; Back to all filters
         </Link>
 
@@ -178,7 +149,7 @@ export default async function FilterDetailsPage({ params }: { params: Promise<{ 
                   href={filter.affiliateUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-5 inline-flex self-start px-4 py-2 rounded-full bg-sky-600 text-white text-sm font-medium hover:bg-sky-700 transition-colors"
+                  className="mt-5 inline-flex self-start px-4 py-2 rounded-full bg-sky-600 text-white text-sm font-medium hover:bg-sky-700 transition-[transform,background-color] duration-150 ease-[var(--ease-out)] active:scale-[0.98] motion-reduce:active:scale-100"
                 >
                   View product
                 </a>

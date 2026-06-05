@@ -6,11 +6,15 @@
     --surface-raised: #ffffff;
     --surface-muted: #f4f6f8;
     --border-soft: #e5e7eb;
+
+    /* Motion tokens */
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --duration-fast: 150ms;
+    --duration-normal: 220ms;
+    --duration-slow: 320ms;
   }
 
-  /* Soft blue-slate — cozy dark mode, not pitch black.
-     Follow the system preference so these surface variables stay in sync with
-     Tailwind v4's `dark:` utilities (which default to prefers-color-scheme). */
   @media (prefers-color-scheme: dark) {
     :root {
       --surface-page: #1e2938;
@@ -20,7 +24,6 @@
     }
   }
 
-  /* Explicit override hook, in case a manual theme toggle is added later. */
   .dark {
     --surface-page: #1e2938;
     --surface-raised: #2d3a4f;
@@ -30,12 +33,256 @@
 
   html {
     color-scheme: light dark;
-    /* Slightly larger default UI — matches ~110% browser zoom feel at 100%. */
     font-size: 110%;
+    scroll-behavior: smooth;
   }
 
   body {
     background-color: var(--surface-page);
     @apply text-gray-900 dark:text-gray-100;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* Opacity-only entrance — never use translateY (no bottom-to-up). */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  @keyframes score-ring-draw {
+    from {
+      stroke-dashoffset: var(--score-circumference);
+    }
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes header-shadow-in {
+    from {
+      box-shadow: 0 0 0 transparent;
+    }
+    to {
+      box-shadow: 0 4px 24px -4px rgb(0 0 0 / 0.08);
+    }
+  }
+
+  .page-enter {
+    animation: fade-in var(--duration-fast) var(--ease-out) both;
+  }
+
+  .page-hero > * {
+    animation: fade-in var(--duration-normal) var(--ease-out) both;
+  }
+
+  .page-hero > *:nth-child(1) { animation-delay: 0ms; }
+  .page-hero > *:nth-child(2) { animation-delay: 50ms; }
+  .page-hero > *:nth-child(3) { animation-delay: 100ms; }
+
+  .stagger-grid > * {
+    animation: fade-in var(--duration-normal) var(--ease-out) both;
+  }
+
+  .stagger-grid > *:nth-child(1) { animation-delay: 0ms; }
+  .stagger-grid > *:nth-child(2) { animation-delay: 20ms; }
+  .stagger-grid > *:nth-child(3) { animation-delay: 40ms; }
+  .stagger-grid > *:nth-child(4) { animation-delay: 60ms; }
+  .stagger-grid > *:nth-child(5) { animation-delay: 80ms; }
+  .stagger-grid > *:nth-child(6) { animation-delay: 100ms; }
+  .stagger-grid > *:nth-child(n + 7) { animation-delay: 120ms; }
+
+  .reveal-item {
+    animation: fade-in var(--duration-normal) var(--ease-out) both;
+  }
+
+  .animate-dropdown {
+    animation: fade-in var(--duration-fast) var(--ease-out) both;
+  }
+
+  .animate-dropdown li {
+    animation: fade-in var(--duration-fast) var(--ease-out) both;
+  }
+
+  .animate-dropdown li:nth-child(1) { animation-delay: 0ms; }
+  .animate-dropdown li:nth-child(2) { animation-delay: 15ms; }
+  .animate-dropdown li:nth-child(3) { animation-delay: 30ms; }
+  .animate-dropdown li:nth-child(4) { animation-delay: 45ms; }
+  .animate-dropdown li:nth-child(n + 5) { animation-delay: 60ms; }
+
+  .card-image-zoom {
+    transition: transform var(--duration-normal) var(--ease-out);
+  }
+
+  .group:hover .card-image-zoom {
+    transform: scale(1.06);
+  }
+
+  .score-ring-animate {
+    animation: score-ring-draw 700ms var(--ease-out) both;
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--surface-muted) 0%,
+      color-mix(in srgb, var(--surface-muted) 70%, white) 50%,
+      var(--surface-muted) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.4s var(--ease-in-out) infinite;
+  }
+
+  .collapsible-panel {
+    display: grid;
+    transition: grid-template-rows var(--duration-normal) var(--ease-out);
+  }
+
+  .collapsible-panel[data-open='false'] {
+    grid-template-rows: 0fr;
+  }
+
+  .collapsible-panel[data-open='true'] {
+    grid-template-rows: 1fr;
+  }
+
+  .collapsible-panel > .collapsible-inner {
+    overflow: hidden;
+  }
+
+  .tab-indicator {
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
+  }
+
+  .tab-indicator:active {
+    transform: scale(0.97);
+  }
+
+  .search-result-item {
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
+  }
+
+  .search-result-item:hover {
+    transform: translateX(2px);
+  }
+
+  .search-result-item:active {
+    transform: scale(0.995);
+  }
+
+  .link-back {
+    transition:
+      color var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
+  }
+
+  .link-back:hover {
+    transform: translateX(-2px);
+  }
+
+  .header-scrolled {
+    animation: header-shadow-in var(--duration-fast) var(--ease-out) both;
+    box-shadow: 0 4px 24px -4px rgb(0 0 0 / 0.08);
+  }
+
+  .dark .header-scrolled,
+  :root:has(.dark) .header-scrolled {
+    box-shadow: 0 4px 24px -4px rgb(0 0 0 / 0.35);
+  }
+
+  .marquee-track {
+    display: flex;
+    gap: 1.5rem;
+    width: max-content;
+    animation: marquee 50s linear infinite;
+  }
+
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+
+  .ingredient-card {
+    transition:
+      transform var(--duration-normal) var(--ease-out),
+      box-shadow var(--duration-normal) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out),
+      background-color var(--duration-fast) var(--ease-out);
+  }
+
+  .ingredient-card:hover {
+    transform: translateX(3px);
+  }
+
+  .ingredient-card:active {
+    transform: translateX(1px) scale(0.995);
+  }
+
+  .tap-card {
+    transition:
+      transform var(--duration-normal) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out),
+      background-color var(--duration-fast) var(--ease-out);
+  }
+
+  .tap-card:active {
+    transform: scale(0.995);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+      animation: none;
+    }
+
+    .group:hover .card-image-zoom {
+      transform: none;
+    }
+
+    .ingredient-card:hover,
+    .search-result-item:hover {
+      transform: none;
+    }
+
+    .tap-card:hover {
+      transform: none;
+    }
   }
 }

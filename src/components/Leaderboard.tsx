@@ -11,7 +11,20 @@ import {
   matchesRankingFilters,
 } from '@/lib/water-filters';
 import WaterFilters from '@/components/WaterFilters';
-import { pillActive, pillCountActive, pillCountInactive, pillInactive } from '@/lib/ui-classes';
+import AnimatedGrid from '@/components/motion/AnimatedGrid';
+import Collapsible from '@/components/motion/Collapsible';
+import EmptyState from '@/components/motion/EmptyState';
+import RevealItem from '@/components/motion/RevealItem';
+import {
+  btnSecondary,
+  cardLink,
+  pillActive,
+  pillButton,
+  pillCountActive,
+  pillCountInactive,
+  pillInactive,
+} from '@/lib/ui-classes';
+import { useLoadMoreReveal } from '@/lib/use-load-more-reveal';
 
 const PAGE_SIZE = 60;
 
@@ -37,15 +50,12 @@ function ScoreBadge({ score }: { score: number }) {
 
 function Card({ water, rank }: { water: WaterCard; rank: number }) {
   return (
-    <Link
-      href={`/water/${water.id}`}
-      className="group relative flex flex-col bg-white dark:bg-[var(--surface-raised)] rounded-xl border border-gray-100 dark:border-[var(--border-soft)] shadow-sm hover:shadow-md hover:border-gray-200 dark:hover:border-gray-500 transition-all duration-200 overflow-hidden"
-    >
+    <Link href={`/water/${water.id}`} className={cardLink}>
       <div className="flex items-start gap-4 p-5">
         <span className="text-sm font-bold text-gray-300 dark:text-gray-600 w-7 shrink-0 pt-1 tabular-nums">#{rank}</span>
-        <div className="relative w-16 h-16 shrink-0">
+        <div className="relative w-16 h-16 shrink-0 overflow-hidden rounded-lg">
           {water.image ? (
-            <Image src={water.image} alt="" fill sizes="64px" className="object-contain" loading="lazy" />
+            <Image src={water.image} alt="" fill sizes="64px" className="object-contain card-image-zoom motion-reduce:transform-none" loading="lazy" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-2xl text-gray-200 dark:text-gray-700" aria-hidden="true">💧</div>
           )}
@@ -74,6 +84,7 @@ export default function Leaderboard({ waters }: { waters: WaterCard[] }) {
   const [rankingFilters, setRankingFilters] = useState<WaterRankingFilters>(EMPTY_FILTERS);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [visible, setVisible] = useState(PAGE_SIZE);
+  const { revealFrom, resetReveal, revealMore } = useLoadMoreReveal();
 
   const activeFilterCount = countActiveFilters(rankingFilters);
 
@@ -91,7 +102,10 @@ export default function Leaderboard({ waters }: { waters: WaterCard[] }) {
     return counts;
   }, [rankingFilters, waters]);
 
-  const resetPagination = () => setVisible(PAGE_SIZE);
+  const resetPagination = () => {
+    setVisible(PAGE_SIZE);
+    resetReveal();
+  };
 
   const shown = filtered.slice(0, visible);
 
@@ -109,9 +123,7 @@ export default function Leaderboard({ waters }: { waters: WaterCard[] }) {
                   setTypeFilter(f.key);
                   resetPagination();
                 }}
-                className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                  active ? pillActive : pillInactive
-                }`}
+                className={`${pillButton} ${active ? pillActive : pillInactive}`}
               >
                 <span aria-hidden="true">{f.emoji}</span>
                 {f.label}
@@ -127,7 +139,7 @@ export default function Leaderboard({ waters }: { waters: WaterCard[] }) {
           <button
             type="button"
             onClick={() => setFiltersOpen((open) => !open)}
-            className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
+            className={`${pillButton} whitespace-nowrap ${
               filtersOpen || activeFilterCount > 0 ? pillActive : pillInactive
             }`}
           >
@@ -143,25 +155,22 @@ export default function Leaderboard({ waters }: { waters: WaterCard[] }) {
         </div>
       </div>
 
-      {filtersOpen && (
-        <div className="mb-6">
-          <WaterFilters
-            value={rankingFilters}
-            onChange={(next) => {
-              setRankingFilters(next);
-              resetPagination();
-            }}
-            onReset={() => {
-              setRankingFilters(EMPTY_FILTERS);
-              resetPagination();
-            }}
-          />
-        </div>
-      )}
+      <Collapsible open={filtersOpen} className="mb-6">
+        <WaterFilters
+          value={rankingFilters}
+          onChange={(next) => {
+            setRankingFilters(next);
+            resetPagination();
+          }}
+          onReset={() => {
+            setRankingFilters(EMPTY_FILTERS);
+            resetPagination();
+          }}
+        />
+      </Collapsible>
 
       {filtered.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-200 dark:border-[var(--border-soft)] bg-white dark:bg-[var(--surface-raised)] px-6 py-12 text-center">
-          <p className="text-gray-700 dark:text-gray-300 font-medium">No waters match these filters.</p>
+        <EmptyState icon="🌊" title="No waters match these filters.">
           <button
             type="button"
             onClick={() => {
@@ -173,22 +182,23 @@ export default function Leaderboard({ waters }: { waters: WaterCard[] }) {
           >
             Clear filters
           </button>
-        </div>
+        </EmptyState>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <AnimatedGrid
+          gridKey={`${typeFilter}-${activeFilterCount}-${JSON.stringify(rankingFilters)}`}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        >
           {shown.map((water, i) => (
-            <Card key={water.id} water={water} rank={i + 1} />
+            <RevealItem key={water.id} index={i} revealFrom={revealFrom}>
+              <Card water={water} rank={i + 1} />
+            </RevealItem>
           ))}
-        </div>
+        </AnimatedGrid>
       )}
 
       {visible < filtered.length && (
         <div className="text-center mt-8">
-          <button
-            type="button"
-            onClick={() => setVisible((v) => v + PAGE_SIZE)}
-            className="px-6 py-2.5 rounded-full bg-white dark:bg-[var(--surface-raised)] border border-gray-200 dark:border-[var(--border-soft)] text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500 hover:shadow-sm transition-all"
-          >
+          <button type="button" onClick={() => setVisible((v) => revealMore(v, PAGE_SIZE))} className={btnSecondary}>
             Show more ({filtered.length - visible} left)
           </button>
         </div>

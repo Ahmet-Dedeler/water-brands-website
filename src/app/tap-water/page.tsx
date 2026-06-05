@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { tapWaterCards } from '@/lib/data';
-import Header from '@/components/Header';
 import TapWaterLeaderboard from '@/components/TapWaterLeaderboard';
+import { motionPress } from '@/lib/ui-classes';
 
 export const metadata: Metadata = {
   title: 'Tap Water Rankings',
@@ -11,31 +12,22 @@ export const metadata: Metadata = {
 };
 
 export default function TapWaterPage() {
-  const withScore = tapWaterCards.filter((location) => location.score != null).length;
-  const withExceeding = tapWaterCards.filter((location) => location.exceedingGuidelines > 0).length;
-
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-[var(--surface-page)]">
-      <Header />
+    <main className="min-h-screen bg-[#151413] text-stone-100">
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-8 sm:px-6 lg:px-8">
+        <Link href="/" className={`flex items-center gap-2 text-sm font-semibold text-indigo-400 ${motionPress}`}>
+          <span className="text-lg" aria-hidden="true">🚰</span>
+          <span>Water Leaderboard</span>
+        </Link>
+        <nav className="flex items-center gap-5 text-sm text-stone-400 sm:gap-6" aria-label="Primary">
+          <Link href="/" className="transition hover:text-stone-100">Rankings</Link>
+          <Link href="/filter" className="transition hover:text-stone-100">Filters</Link>
+          <Link href="/ingredients" className="hidden transition hover:text-stone-100 sm:inline">Ingredients</Link>
+          <Link href="/scoring" className="hidden transition hover:text-stone-100 sm:inline">Scoring</Link>
+        </nav>
+      </header>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <div className="text-center mb-10">
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-100 mb-3">
-            Tap Water Rankings
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Municipal tap water quality by city and utility — contaminants, guideline exceedances
-            and local water system scores.
-          </p>
-          <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 mt-6 text-sm text-gray-500 dark:text-gray-400">
-            <span><strong className="text-gray-900 dark:text-gray-100">{tapWaterCards.length.toLocaleString()}</strong> locations</span>
-            <span><strong className="text-gray-900 dark:text-gray-100">{withScore.toLocaleString()}</strong> scored</span>
-            <span><strong className="text-gray-900 dark:text-gray-100">{withExceeding.toLocaleString()}</strong> with guideline exceedances</span>
-          </div>
-        </div>
-
-        <TapWaterLeaderboard locations={tapWaterCards} />
-      </div>
+      <TapWaterLeaderboard locations={tapWaterCards} />
     </main>
   );
 }
