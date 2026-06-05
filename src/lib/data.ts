@@ -18,6 +18,9 @@ import type {
   WaterFilter,
   WaterFilterCard,
 } from '@/types';
+import { siteUrl } from '@/lib/site';
+
+export { siteUrl };
 
 export const waters = watersData as Water[];
 export const waterCards = waterCardsData as WaterCard[];
@@ -44,5 +47,3 @@ export const getLab = (id: number | null): LabDetail | null => {
   return labs[id.toString()] ?? null;
 };
 
-export const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://waterqualityrank.org';

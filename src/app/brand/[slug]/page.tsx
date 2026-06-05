@@ -1,19 +1,34 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import Header from '@/components/Header';
+import { absoluteUrl, pageMetadata } from '@/lib/metadata';
 import {
   brands,
   getBrand,
-  ingredientSearchCards,
-  waterCards,
-  waterFilterCards,
   waters,
   waterFilters,
 } from '@/lib/data';
 
 export async function generateStaticParams() {
   return brands.map((brand) => ({ slug: brand.slug }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const brand = getBrand(slug);
+  if (!brand) return { title: 'Brand Not Found' };
+
+  const title = `${brand.name} — Ranked Waters & Filters`;
+  const description = `${brand.name} has ${brand.waterCount} ranked bottled waters and ${brand.filterCount} water filters with lab-tested purity scores on Water Leaderboard.`;
+
+  return pageMetadata({
+    title,
+    description,
+    path: `/brand/${slug}`,
+    image: brand.image,
+  });
 }
 
 export default async function BrandPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -24,9 +39,21 @@ export default async function BrandPage({ params }: { params: Promise<{ slug: st
   const brandWaters = waters.filter((w) => w.brandSlug === slug);
   const brandFilters = waterFilters.filter((f) => f.brandSlug === slug);
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Brand',
+    name: brand.name,
+    url: absoluteUrl(`/brand/${slug}`),
+    logo: brand.image ?? undefined,
+  };
+
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-[var(--surface-page)]">
-      <Header waters={waterCards} filters={waterFilterCards} ingredients={ingredientSearchCards} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <Header />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <Link href="/" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4 inline-block">
           &larr; Back

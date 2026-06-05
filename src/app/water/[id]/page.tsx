@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import type { Water, IngredientsMap, ScoreBreakdownItem } from '@/types';
-import { getLab, getWater, ingredientSearchCards, ingredients, siteUrl, waterCards, waterFilterCards } from '@/lib/data';
+import { getLab, getWater, ingredients, siteUrl } from '@/lib/data';
 import Header from '@/components/Header';
 import ScoreCircle from '@/components/ScoreCircle';
 import { Metadata } from 'next';
@@ -136,7 +136,7 @@ export default async function WaterDetailsPage({ params }: { params: Promise<{ i
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Header waters={waterCards} filters={waterFilterCards} ingredients={ingredientSearchCards} />
+      <Header />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <Link href="/" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4 inline-block">
           &larr; Back to all waters

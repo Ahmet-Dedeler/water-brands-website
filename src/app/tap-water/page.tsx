@@ -1,6 +1,14 @@
-import { ingredientSearchCards, tapWaterCards, waterCards, waterFilterCards } from '@/lib/data';
+import type { Metadata } from 'next';
+import { tapWaterCards } from '@/lib/data';
 import Header from '@/components/Header';
 import TapWaterLeaderboard from '@/components/TapWaterLeaderboard';
+
+export const metadata: Metadata = {
+  title: 'Tap Water Rankings',
+  description:
+    'Municipal tap water quality by city and utility — contaminants, guideline exceedances and local water system scores across the United States.',
+  alternates: { canonical: '/tap-water' },
+};
 
 export default function TapWaterPage() {
   const withScore = tapWaterCards.filter((location) => location.score != null).length;
@@ -8,7 +16,7 @@ export default function TapWaterPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-[var(--surface-page)]">
-      <Header waters={waterCards} filters={waterFilterCards} ingredients={ingredientSearchCards} />
+      <Header />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div className="text-center mb-10">

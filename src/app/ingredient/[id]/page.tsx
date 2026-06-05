@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Header from '@/components/Header';
-import { getIngredient, ingredientSearchCards, siteUrl, waterCards, waterFilterCards, waters } from '@/lib/data';
+import { getIngredient, siteUrl, waters } from '@/lib/data';
 import { waterTypeLabel } from '@/lib/format';
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
@@ -121,7 +121,7 @@ export default async function IngredientPage({ params }: { params: Promise<{ id:
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Header waters={waterCards} filters={waterFilterCards} ingredients={ingredientSearchCards} />
+      <Header />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <Link href="/" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4 inline-block">
           &larr; Back to all waters

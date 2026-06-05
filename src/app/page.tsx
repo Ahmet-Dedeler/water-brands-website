@@ -1,13 +1,21 @@
-import { ingredientSearchCards, waterCards, waterFilterCards } from '@/lib/data';
+import type { Metadata } from 'next';
+import { waterCards } from '@/lib/data';
 import Header from '@/components/Header';
 import Leaderboard from '@/components/Leaderboard';
+
+export const metadata: Metadata = {
+  title: 'Water Brands Leaderboard',
+  description:
+    'Compare bottled, sparkling and gallon waters ranked by lab-tested purity, source quality, packaging and contaminants.',
+  alternates: { canonical: '/' },
+};
 
 export default function Home() {
   const labTested = waterCards.filter((w) => w.hasLabTest).length;
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-[var(--surface-page)]">
-      <Header waters={waterCards} filters={waterFilterCards} ingredients={ingredientSearchCards} />
+      <Header />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div className="text-center mb-10">

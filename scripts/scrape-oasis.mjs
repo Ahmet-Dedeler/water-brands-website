@@ -361,6 +361,16 @@ async function main() {
   const productRows = uniqueBySourceAndId([...items, ...allWaterItems, ...waterFilters, ...airFilters]);
   const refs = collectProductReferences(productRows);
 
+  if (includeTapWater) {
+    for (const location of tapWaterLocations) {
+      for (const utility of Array.isArray(location.utilities) ? location.utilities : []) {
+        for (const contaminant of Array.isArray(utility.contaminants) ? utility.contaminants : []) {
+          if (contaminant?.ingredient_id) refs.ingredients.add(contaminant.ingredient_id);
+        }
+      }
+    }
+  }
+
   const ingredients = await fetchByIds('ingredients', refs.ingredients, { label: 'ingredients' });
   const brands = await fetchByIds('brands', refs.brands, { label: 'brands' });
   const companies = await fetchByIds('companies', refs.companies, { label: 'companies' });

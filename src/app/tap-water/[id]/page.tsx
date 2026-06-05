@@ -1,8 +1,28 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import Header from '@/components/Header';
-import { getIngredient, ingredientSearchCards, waterCards, waterFilterCards } from '@/lib/data';
+import { getIngredient } from '@/lib/data';
+import { absoluteUrl, pageMetadata } from '@/lib/metadata';
 import { getTapWaterById } from '@/lib/tap-water';
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const location = await getTapWaterById(id);
+  if (!location) return { title: 'Tap Water Not Found' };
+
+  const place = [location.name, location.state, location.zipCode].filter(Boolean).join(', ');
+  const title = `${place} Tap Water Quality`;
+  const scorePart = location.score != null ? ` Score ${location.score}/100.` : '';
+  const description = `Tap water quality for ${place}: contaminants, utility scores and guideline exceedances.${scorePart}`;
+
+  return pageMetadata({
+    title,
+    description,
+    path: `/tap-water/${id}`,
+    image: location.image,
+  });
+}
 
 export default async function TapWaterDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -13,12 +33,37 @@ export default async function TapWaterDetailPage({ params }: { params: Promise<{
     utility.contaminants.map((item) => ({
       ...item,
       ingredient: getIngredient(item.ingredient_id.toString()),
-    }))
+    })),
   );
+
+  const place = [location.name, location.state, location.zipCode].filter(Boolean).join(', ');
+  const exceeding = location.utilities.reduce(
+    (sum, utility) => sum + utility.contaminantsExceedingGuidelines,
+    0,
+  );
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Place',
+    name: place,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: location.name ?? undefined,
+      addressRegion: location.state ?? undefined,
+      postalCode: location.zipCode ?? undefined,
+      addressCountry: location.country ?? undefined,
+    },
+    url: absoluteUrl(`/tap-water/${id}`),
+    description: `Municipal tap water quality data for ${place}.`,
+  };
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-[var(--surface-page)]">
-      <Header waters={waterCards} filters={waterFilterCards} ingredients={ingredientSearchCards} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <Header />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <Link href="/tap-water" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4 inline-block">
           &larr; Back to tap water rankings
@@ -32,6 +77,11 @@ export default async function TapWaterDetailPage({ params }: { params: Promise<{
             </p>
             <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
               Score: <span className="font-semibold text-gray-900 dark:text-gray-100">{location.score ?? 'N/A'}</span>
+              {exceeding > 0 && (
+                <span className="ml-3 text-amber-700 dark:text-amber-400">
+                  {exceeding} contaminant{exceeding === 1 ? '' : 's'} over health guideline
+                </span>
+              )}
             </div>
           </div>
 

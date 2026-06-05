@@ -204,6 +204,27 @@ export interface IngredientSearchCard {
   is_contaminant: boolean;
 }
 
+export interface WaterSearchEntry {
+  id: number;
+  name: string;
+  brandName: string | null;
+  type: WaterType;
+}
+
+export interface FilterSearchEntry {
+  id: number;
+  name: string;
+  brandName: string | null;
+  type: WaterFilterType;
+}
+
+export interface TapWaterSearchEntry {
+  id: number;
+  name: string;
+  state: string | null;
+  zipCode: string | null;
+}
+
 export type WaterFilterType =
   | 'filter'
   | 'sink_filter'

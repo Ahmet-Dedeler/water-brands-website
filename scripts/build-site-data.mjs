@@ -4,7 +4,7 @@
 //
 // Usage: npm run build:data   (or: node scripts/build-site-data.mjs)
 
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import { createInterface } from 'node:readline';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -38,8 +38,40 @@ const readJsonIfPresent = (name, fallback) => {
 function slugify(value) {
   return value
     .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
+}
+
+const OASIS_REST_URL = 'https://connect.live-oasis.com/rest/v1';
+const OASIS_PUBLISHABLE_KEY = 'sb_publishable_I9h6Pl639oJuC1uMSuqxGw_fnbXxpCA';
+
+async function fetchMissingIngredients(ids, existingById) {
+  const missing = [...ids].filter((id) => !existingById.has(id));
+  if (missing.length === 0) return [];
+
+  const rows = [];
+  const chunkSize = 500;
+  for (let index = 0; index < missing.length; index += chunkSize) {
+    const chunk = missing.slice(index, index + chunkSize);
+    const url = `${OASIS_REST_URL}/ingredients?select=*&id=in.(${chunk.join(',')})&order=id.asc`;
+    const response = await fetch(url, {
+      headers: {
+        apikey: OASIS_PUBLISHABLE_KEY,
+        Authorization: `Bearer ${OASIS_PUBLISHABLE_KEY}`,
+        Range: '0-999',
+      },
+    });
+    if (!response.ok) {
+      console.warn(`Could not fetch ${chunk.length} missing ingredients: ${response.status}`);
+      continue;
+    }
+    rows.push(...(await response.json()));
+    process.stdout.write(`\rFetched missing ingredients: ${rows.length}/${missing.length}`);
+  }
+  if (missing.length > 0) process.stdout.write('\n');
+  return rows;
 }
 
 function findTapWaterFile() {
@@ -88,9 +120,14 @@ function mapLab(lab) {
   };
 }
 
+const STATE_SLUG_ALIASES = {
+  hawai: 'hawaii',
+};
+
 function stateSlug(state) {
   if (!state) return 'unknown';
-  return slugify(state);
+  const slug = slugify(state);
+  return STATE_SLUG_ALIASES[slug] ?? slug;
 }
 
 function mapTapWater(row) {
@@ -404,6 +441,11 @@ if (tapWaterFile) {
   }
 }
 
+const missingIngredientRows = await fetchMissingIngredients(referencedIngredientIds, ingredientById);
+for (const row of missingIngredientRows) {
+  ingredientById.set(row.id, row);
+}
+
 const ingredientMap = {};
 for (const id of referencedIngredientIds) {
   const ref = ingredientById.get(id) ?? inlineIngredientById.get(id);
@@ -475,6 +517,44 @@ const filterCards = waterFilters.map((f) => ({
   categoryCount: f.filteredContaminantCategories.length,
 }));
 
+const searchWaters = cards.map((w) => ({
+  id: w.id,
+  name: w.name,
+  brandName: w.brandName,
+  type: w.type,
+}));
+
+const searchFilters = filterCards.map((f) => ({
+  id: f.id,
+  name: f.name,
+  brandName: f.brandName,
+  type: f.type,
+}));
+
+const searchIngredients = Object.values(ingredientMap).map((ingredient) => ({
+  id: ingredient.id,
+  name: ingredient.name,
+  category: ingredient.category,
+  is_contaminant: ingredient.is_contaminant,
+}));
+
+const searchTapWater = tapWaterCards.map((location) => ({
+  id: location.id,
+  name: location.name,
+  state: location.state,
+  zipCode: location.zipCode,
+}));
+
+writeFileSync(
+  join(OUT, 'search-index.json'),
+  JSON.stringify({
+    waters: searchWaters,
+    filters: searchFilters,
+    ingredients: searchIngredients,
+  }),
+);
+writeFileSync(join(OUT, 'search-tap-water.json'), JSON.stringify(searchTapWater));
+
 writeFileSync(join(OUT, 'waters.json'), JSON.stringify(waters));
 writeFileSync(join(OUT, 'water-cards.json'), JSON.stringify(cards));
 writeFileSync(join(OUT, 'ingredients.json'), JSON.stringify(ingredientMap));
@@ -488,6 +568,13 @@ writeFileSync(join(OUT, 'tap-water-cards.json'), JSON.stringify(tapWaterCards));
 writeFileSync(join(tapWaterDir, 'id-index.json'), JSON.stringify(tapWaterIdIndex));
 for (const [stateKey, records] of tapWaterByState) {
   writeFileSync(join(tapWaterDir, `${stateKey}.json`), JSON.stringify(records));
+}
+for (const staleFile of readdirSync(tapWaterDir)) {
+  if (!staleFile.endsWith('.json') || staleFile === 'id-index.json') continue;
+  const stateKey = staleFile.replace(/\.json$/, '');
+  if (!tapWaterByState.has(stateKey)) {
+    unlinkSync(join(tapWaterDir, staleFile));
+  }
 }
 
 const byType = waters.reduce((acc, w) => {
@@ -510,3 +597,5 @@ console.log(`Wrote ${brandRecords.length} brands to src/data/brands.json`);
 console.log(`Wrote ${Object.keys(labsMap).length} labs to src/data/labs.json`);
 console.log(`Wrote ${tapWaterCards.length} tap water cards to src/data/tap-water-cards.json`);
 console.log(`Wrote ${tapWaterByState.size} tap water state files under src/data/tap-water/`);
+console.log(`Wrote search-index.json (${searchWaters.length} waters, ${searchFilters.length} filters, ${searchIngredients.length} ingredients)`);
+console.log(`Wrote search-tap-water.json (${searchTapWater.length} tap water locations)`);
