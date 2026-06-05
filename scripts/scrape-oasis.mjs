@@ -12,6 +12,13 @@ const OUTPUT_ROOT = path.join(process.cwd(), 'data', 'oasis');
 const PAGE_SIZE = 1000;
 const IMAGE_AUDIT_CONCURRENCY = 24;
 const IMAGE_REQUEST_TIMEOUT_MS = 12000;
+const WATER_CATEGORY_TYPES = [
+  'bottled_water',
+  'water_gallon',
+  'flavored_water',
+  'sparkling_water',
+  'hydrogen_water',
+];
 
 const args = new Set(process.argv.slice(2));
 const includeTapWater = args.has('--include-tap-water');
@@ -115,6 +122,20 @@ function collectProductReferences(products) {
   }
 
   return refs;
+}
+
+function uniqueBySourceAndId(products) {
+  const seen = new Set();
+  const unique = [];
+
+  for (const product of products) {
+    const key = `${product.__source_table}:${product.id}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push(product);
+  }
+
+  return unique;
 }
 
 function normalizeImageUrls(product) {
@@ -313,6 +334,12 @@ async function main() {
     { label: 'verified items' },
   )).map((row) => normalizeImageUrls({ ...row, __source_table: 'items' }));
 
+  const allWaterItems = (await fetchAll(
+    'items',
+    `select=*&type=in.(${WATER_CATEGORY_TYPES.join(',')})&order=score.desc.nullslast,id.asc`,
+    { label: 'all water-category items' },
+  )).map((row) => normalizeImageUrls({ ...row, __source_table: 'items' }));
+
   const waterFilters = (await fetchAll(
     'water_filters',
     'select=*&order=score.desc.nullslast,id.asc',
@@ -331,7 +358,7 @@ async function main() {
     })
     : [];
 
-  const productRows = [...items, ...waterFilters, ...airFilters];
+  const productRows = uniqueBySourceAndId([...items, ...allWaterItems, ...waterFilters, ...airFilters]);
   const refs = collectProductReferences(productRows);
 
   const ingredients = await fetchByIds('ingredients', refs.ingredients, { label: 'ingredients' });
@@ -373,6 +400,7 @@ async function main() {
     counts: {
       categories: categories.length,
       verified_items: items.length,
+      all_water_category_items: allWaterItems.length,
       water_filters: waterFilters.length,
       air_filters: airFilters.length,
       tap_water_locations: tapWaterLocations.length,
@@ -389,12 +417,14 @@ async function main() {
       image_audit_rows: imageAudit.length,
     },
     item_type_counts: countBy(items, 'type'),
+    all_water_item_type_counts: countBy(allWaterItems, 'type'),
     water_filter_type_counts: countBy(waterFilters, 'type'),
     air_filter_type_counts: countBy(airFilters, 'type'),
     output_files: [
       'manifest.json',
       'categories.json',
       'items_verified.json',
+      'items_water_all.json',
       'water_filters.json',
       'air_filters.json',
       includeTapWater ? 'tap_water_locations.json' : null,
@@ -416,6 +446,7 @@ async function main() {
   await writeJson(outputDir, 'manifest.json', manifest);
   await writeJson(outputDir, 'categories.json', categories);
   await writeJson(outputDir, 'items_verified.json', items);
+  await writeJson(outputDir, 'items_water_all.json', allWaterItems);
   await writeJson(outputDir, 'water_filters.json', waterFilters);
   await writeJson(outputDir, 'air_filters.json', airFilters);
   if (includeTapWater) await writeJson(outputDir, 'tap_water_locations.json', tapWaterLocations);

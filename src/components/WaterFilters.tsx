@@ -46,7 +46,9 @@ function Section({ title, emoji, children }: { title: string; emoji: string; chi
   return (
     <section>
       <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">
-        <span aria-hidden="true">{emoji}</span>
+        <span aria-hidden="true" className="text-base leading-none shrink-0">
+          {emoji}
+        </span>
         {title}
       </p>
       <div className="flex flex-wrap gap-2">{children}</div>
@@ -107,7 +109,7 @@ export default function WaterFilters({
         </FilterChip>
       </div>
 
-      <Section title="Cap safety" emoji="🧢">
+      <Section title="Cap safety" emoji="🍾">
         {CAP_SAFETY_OPTIONS.map((option) => (
           <FilterChip
             key={option.value}

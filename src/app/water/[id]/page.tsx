@@ -1,15 +1,14 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
-import ingredientsMap from '@/data/ingredients.json';
 import type { Water, IngredientsMap, ScoreBreakdownItem } from '@/types';
-import { getWater, siteUrl, waterCards, waters } from '@/lib/data';
+import { getWater, ingredients, siteUrl, waterCards, waters } from '@/lib/data';
 import Header from '@/components/Header';
 import ScoreCircle from '@/components/ScoreCircle';
 import { Metadata } from 'next';
 import { waterTypeLabel, titleize, microplasticsRisk } from '@/lib/format';
 
-const ingredients = ingredientsMap as IngredientsMap;
+const ingredientDetails = ingredients as IngredientsMap;
 
 export function generateStaticParams() {
   return waters.map((w) => ({ id: w.id.toString() }));
@@ -41,7 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 function resolveIngredients(water: Water) {
   return water.ingredients
     .map((ref) => {
-      const detail = ingredients[ref.ingredient_id];
+      const detail = ingredientDetails[ref.ingredient_id];
       if (!detail || !detail.name) return null;
       const isContaminant = detail.is_contaminant || ref.is_contaminant === true;
       return { ...ref, ...detail, is_contaminant: isContaminant };
@@ -236,7 +235,11 @@ export default async function WaterDetailsPage({ params }: { params: Promise<{ i
                 {contaminants.map((item, index) => (
                   <li key={index} className="p-4 bg-rose-50 dark:bg-rose-950/30 border-l-4 border-rose-500 rounded-r-lg">
                     <div className="flex justify-between items-baseline gap-3">
-                      <h3 className="font-semibold text-rose-900 dark:text-rose-200">{item.name}</h3>
+                      <h3 className="font-semibold text-rose-900 dark:text-rose-200">
+                        <Link href={`/ingredient/${item.ingredient_id}`} className="hover:underline">
+                          {item.name}
+                        </Link>
+                      </h3>
                       {item.amount != null && (
                         <span className="text-sm font-medium text-rose-600 dark:text-rose-400 whitespace-nowrap">
                           {item.amount} {item.measure}
@@ -264,7 +267,11 @@ export default async function WaterDetailsPage({ params }: { params: Promise<{ i
                 {nutrients.map((item, index) => (
                   <li key={index} className="p-4 bg-emerald-50 dark:bg-emerald-950/30 border-l-4 border-emerald-500 rounded-r-lg">
                     <div className="flex justify-between items-baseline gap-3">
-                      <h3 className="font-semibold text-emerald-900 dark:text-emerald-200">{item.name}</h3>
+                      <h3 className="font-semibold text-emerald-900 dark:text-emerald-200">
+                        <Link href={`/ingredient/${item.ingredient_id}`} className="hover:underline">
+                          {item.name}
+                        </Link>
+                      </h3>
                       {item.amount != null && (
                         <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400 whitespace-nowrap">
                           {item.amount} {item.measure}

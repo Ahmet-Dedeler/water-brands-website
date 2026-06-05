@@ -22,6 +22,7 @@ const TYPE_FILTERS: { key: TypeFilter; label: string; emoji: string }[] = [
   { key: 'sparkling_water', label: 'Sparkling', emoji: '🫧' },
   { key: 'water_gallon', label: 'Gallon', emoji: '🪣' },
   { key: 'flavored_water', label: 'Flavored', emoji: '🍋' },
+  { key: 'hydrogen_water', label: 'Hydrogen', emoji: 'H₂' },
 ];
 
 function ScoreBadge({ score }: { score: number }) {

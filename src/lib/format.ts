@@ -7,6 +7,7 @@ const TYPE_LABELS: Record<WaterType, string> = {
   sparkling_water: 'Sparkling',
   water_gallon: 'Gallon',
   flavored_water: 'Flavored',
+  hydrogen_water: 'Hydrogen',
 };
 
 export const waterTypeLabel = (type: WaterType): string => TYPE_LABELS[type] ?? type;

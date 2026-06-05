@@ -24,11 +24,21 @@ const WATER_TYPES = new Set([
   'sparkling_water',
   'water_gallon',
   'flavored_water',
+  'hydrogen_water',
 ]);
 
 const readJson = (name) => JSON.parse(readFileSync(join(OASIS, name), 'utf8'));
+const readJsonIfPresent = (name, fallback) => {
+  try {
+    return readJson(name);
+  } catch (error) {
+    if (error?.code !== 'ENOENT') throw error;
+    return fallback;
+  }
+};
 
-const items = readJson('items_verified.json');
+const verifiedItems = readJson('items_verified.json');
+const items = readJsonIfPresent('items_water_all.json', verifiedItems);
 const brands = readJson('brands_referenced.json');
 const companies = readJson('companies_referenced.json');
 const ingredients = readJson('ingredients_referenced.json');
@@ -144,14 +154,24 @@ for (const id of referencedIngredientIds) {
   const ref = ingredientById.get(id);
   if (!ref) continue;
   ingredientMap[id] = {
+    id: ref.id,
     name: ref.name ?? '',
     description: ref.description ?? null,
+    category: ref.category ?? null,
+    image: ref.image ?? null,
     benefits: ref.benefits ?? null,
     risks: ref.risks ?? null,
     is_contaminant: Boolean(ref.is_contaminant),
+    severity_score: ref.severity_score ?? 0,
+    bonus_score: ref.bonus_score ?? 0,
     measure: ref.measure ?? null,
     legal_limit: ref.legal_limit ?? null,
     health_guideline: ref.health_guideline ?? null,
+    measure_food: ref.measure_food ?? null,
+    legal_limit_food: ref.legal_limit_food ?? null,
+    health_guideline_food: ref.health_guideline_food ?? null,
+    sources: (ref.sources || []).filter((s) => s && s.url),
+    updated_at: ref.updated_at ?? null,
   };
 }
 

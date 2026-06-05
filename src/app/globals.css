@@ -3,6 +3,8 @@
 @layer base {
   html {
     color-scheme: light dark;
+    /* Slightly larger default UI — matches ~110% browser zoom feel at 100%. */
+    font-size: 110%;
   }
 
   body {

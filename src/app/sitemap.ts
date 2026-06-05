@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { siteUrl, waterCards } from '@/lib/data';
+import { ingredientList, siteUrl, waterCards } from '@/lib/data';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
@@ -14,6 +14,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.7,
+    })),
+    ...ingredientList.map((ingredient) => ({
+      url: `${siteUrl}/ingredient/${ingredient.id}`,
+      lastModified: ingredient.updated_at ? new Date(ingredient.updated_at) : new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: ingredient.is_contaminant ? 0.65 : 0.55,
     })),
   ];
 }

@@ -4,7 +4,8 @@ export type WaterType =
   | 'bottled_water'
   | 'sparkling_water'
   | 'water_gallon'
-  | 'flavored_water';
+  | 'flavored_water'
+  | 'hydrogen_water';
 
 export interface WaterIngredientRef {
   ingredient_id: number;
@@ -100,14 +101,24 @@ export interface WaterCard {
 }
 
 export interface IngredientDetail {
+  id: number;
   name: string;
   description: string | null;
+  category: string | null;
+  image: string | null;
   benefits: string | null;
   risks: string | null;
   is_contaminant: boolean;
+  severity_score: number;
+  bonus_score: number;
   measure: string | null;
   legal_limit: number | null;
   health_guideline: number | null;
+  measure_food: string | null;
+  legal_limit_food: number | null;
+  health_guideline_food: number | null;
+  sources: Source[];
+  updated_at: string | null;
 }
 
 export interface IngredientsMap {
