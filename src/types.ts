@@ -50,11 +50,80 @@ export interface WaterRankingFilters {
   waterSource: WaterSourceFilter | null;
 }
 
+export interface LabContaminant {
+  name: string;
+  amount: number;
+  measure: string | null;
+  status: string | null;
+}
+
+export interface LabDetail {
+  id: number;
+  laboratory: string | null;
+  reportDate: string | null;
+  sampleDate: string | null;
+  methodology: string | null;
+  reportNumber: string | null;
+  sampleDescription: string | null;
+  status: string | null;
+  contaminants: LabContaminant[];
+}
+
+export interface LabsMap {
+  [id: string]: LabDetail;
+}
+
+export interface Brand {
+  id: number;
+  slug: string;
+  name: string;
+  image: string | null;
+  companyName: string | null;
+  waterCount: number;
+  filterCount: number;
+  productCount: number;
+}
+
+export interface TapWaterUtility {
+  name: string;
+  score: number | null;
+  zipCodes: string | null;
+  totalContaminants: number;
+  contaminantsExceedingGuidelines: number;
+  contaminants: { ingredient_id: number; amount: number | null }[];
+}
+
+export interface TapWater {
+  id: number;
+  name: string;
+  score: number | null;
+  image: string | null;
+  state: string | null;
+  country: string | null;
+  zipCode: string | null;
+  utilities: TapWaterUtility[];
+  sources: Source[];
+}
+
+export interface TapWaterCard {
+  id: number;
+  name: string;
+  score: number | null;
+  state: string | null;
+  country: string | null;
+  zipCode: string | null;
+  utilityCount: number;
+  contaminantCount: number;
+  exceedingGuidelines: number;
+}
+
 export interface Water {
   id: number;
   name: string;
   type: WaterType;
   score: number;
+  brandId: number | null;
+  brandSlug: string | null;
   brandName: string | null;
   companyName: string | null;
   description: string | null;
@@ -64,6 +133,8 @@ export interface Water {
   capMaterial: string | null;
   waterSource: string | null;
   hasLabTest: boolean;
+  labId: number | null;
+  labReports: Source[];
   noMicroplastics: boolean;
   capSafety: CapSafety | null;
   isDistilled: boolean;
@@ -88,6 +159,7 @@ export interface WaterCard {
   type: WaterType;
   score: number;
   brandName: string | null;
+  brandSlug: string | null;
   image: string | null;
   packaging: string | null;
   waterSource: string | null;
@@ -150,6 +222,8 @@ export interface WaterFilter {
   name: string;
   type: WaterFilterType;
   score: number;
+  brandId: number | null;
+  brandSlug: string | null;
   brandName: string | null;
   companyName: string | null;
   description: string | null;
@@ -162,6 +236,8 @@ export interface WaterFilter {
   price: number | null;
   lifeSpan: string | null;
   hasLabTest: boolean;
+  labId: number | null;
+  labReports: Source[];
   affiliateUrl: string | null;
   views: number;
   scoreBreakdown: ScoreBreakdownItem[];
@@ -174,6 +250,7 @@ export interface WaterFilterCard {
   type: WaterFilterType;
   score: number;
   brandName: string | null;
+  brandSlug: string | null;
   image: string | null;
   technologies: string[];
   hasLabTest: boolean;

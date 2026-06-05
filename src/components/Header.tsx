@@ -8,7 +8,7 @@ import type { IngredientSearchCard, WaterCard, WaterFilterCard } from '@/types';
 import { waterTypeLabel, filterTypeLabel } from '@/lib/format';
 import { pillActive, pillInactive } from '@/lib/ui-classes';
 
-type Section = 'drinks' | 'filter' | 'scoring' | 'ingredient';
+type Section = 'drinks' | 'filter' | 'tap-water' | 'scoring' | 'ingredient';
 
 export default function Header({
   waters,
@@ -22,8 +22,12 @@ export default function Header({
   const pathname = usePathname();
   const section: Section = pathname.startsWith('/filter')
     ? 'filter'
+    : pathname.startsWith('/tap-water')
+      ? 'tap-water'
     : pathname.startsWith('/ingredient')
       ? 'ingredient'
+      : pathname.startsWith('/ingredients')
+        ? 'ingredient'
       : pathname.startsWith('/scoring')
         ? 'scoring'
         : 'drinks';
@@ -108,6 +112,14 @@ export default function Header({
               <Link href="/filter" className={navLinkClass(section === 'filter')}>
                 <span aria-hidden="true">🫖</span>
                 Filter
+              </Link>
+              <Link href="/tap-water" className={navLinkClass(section === 'tap-water')}>
+                <span aria-hidden="true">🚰</span>
+                Tap
+              </Link>
+              <Link href="/ingredients" className={navLinkClass(section === 'ingredient')}>
+                <span aria-hidden="true">🧪</span>
+                Ingredients
               </Link>
               <Link href="/scoring" className={navLinkClass(section === 'scoring')}>
                 <span aria-hidden="true">📊</span>

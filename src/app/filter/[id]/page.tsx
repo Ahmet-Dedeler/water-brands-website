@@ -2,11 +2,12 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import type { ScoreBreakdownItem } from '@/types';
-import { getWaterFilter, ingredientSearchCards, siteUrl, waterCards, waterFilterCards } from '@/lib/data';
+import { getLab, getWaterFilter, ingredientSearchCards, siteUrl, waterCards, waterFilterCards } from '@/lib/data';
 import Header from '@/components/Header';
 import ScoreCircle from '@/components/ScoreCircle';
 import { Metadata } from 'next';
 import { filterTypeLabel, titleize } from '@/lib/format';
+import LabReportsSection from '@/components/LabReportsSection';
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
@@ -84,6 +85,7 @@ export default async function FilterDetailsPage({ params }: { params: Promise<{ 
   const { id } = await params;
   const filter = getWaterFilter(id);
   if (!filter) notFound();
+  const lab = getLab(filter.labId);
 
   const chips = [
     filter.tags && titleize(filter.tags),
@@ -140,7 +142,18 @@ export default async function FilterDetailsPage({ params }: { params: Promise<{ 
                 {filterTypeLabel(filter.type)}
               </span>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">{filter.name}</h1>
-              {filter.brandName && <p className="text-gray-500 dark:text-gray-400 mt-1">by {filter.brandName}</p>}
+              {filter.brandName && (
+                <p className="text-gray-500 dark:text-gray-400 mt-1">
+                  by{' '}
+                  {filter.brandSlug ? (
+                    <Link href={`/brand/${filter.brandSlug}`} className="hover:underline">
+                      {filter.brandName}
+                    </Link>
+                  ) : (
+                    filter.brandName
+                  )}
+                </p>
+              )}
 
               <div className="flex items-center gap-4 mt-4">
                 <ScoreCircle score={filter.score} size={80} />
@@ -199,6 +212,8 @@ export default async function FilterDetailsPage({ params }: { params: Promise<{ 
                 </ul>
               </section>
             )}
+
+            <LabReportsSection lab={lab} labReports={filter.labReports} />
 
             {filter.technologies.length > 0 && (
               <section>

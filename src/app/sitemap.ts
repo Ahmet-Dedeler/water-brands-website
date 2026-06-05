@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { ingredientList, siteUrl, waterCards, waterFilterCards } from '@/lib/data';
+import { brands, ingredientList, siteUrl, tapWaterCards, waterCards, waterFilterCards } from '@/lib/data';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
@@ -27,6 +27,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.75,
     },
+    {
+      url: `${siteUrl}/ingredients`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    },
+    {
+      url: `${siteUrl}/tap-water`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
     ...waterCards.map((w) => ({
       url: `${siteUrl}/water/${w.id}`,
       lastModified: new Date(),
@@ -44,6 +56,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: ingredient.updated_at ? new Date(ingredient.updated_at) : new Date(),
       changeFrequency: 'monthly' as const,
       priority: ingredient.is_contaminant ? 0.65 : 0.55,
+    })),
+    ...brands.map((brand) => ({
+      url: `${siteUrl}/brand/${brand.slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.65,
+    })),
+    ...tapWaterCards.map((location) => ({
+      url: `${siteUrl}/tap-water/${location.id}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
     })),
   ];
 }

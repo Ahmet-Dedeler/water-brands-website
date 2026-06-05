@@ -2,11 +2,12 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import type { Water, IngredientsMap, ScoreBreakdownItem } from '@/types';
-import { getWater, ingredientSearchCards, ingredients, siteUrl, waterCards, waterFilterCards } from '@/lib/data';
+import { getLab, getWater, ingredientSearchCards, ingredients, siteUrl, waterCards, waterFilterCards } from '@/lib/data';
 import Header from '@/components/Header';
 import ScoreCircle from '@/components/ScoreCircle';
 import { Metadata } from 'next';
 import { waterTypeLabel, titleize, microplasticsRisk } from '@/lib/format';
+import LabReportsSection from '@/components/LabReportsSection';
 
 const ingredientDetails = ingredients as IngredientsMap;
 
@@ -103,6 +104,7 @@ export default async function WaterDetailsPage({ params }: { params: Promise<{ i
   const nutrients = resolved.filter((i) => !i.is_contaminant);
 
   const labTested = water.scoreBreakdown.some((b) => b.id === 'lab_report' && b.score > 0);
+  const lab = getLab(water.labId);
   const mpRisk = microplasticsRisk(water.packaging);
 
   const chips = [
@@ -161,7 +163,18 @@ export default async function WaterDetailsPage({ params }: { params: Promise<{ i
                 {waterTypeLabel(water.type)}
               </span>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">{water.name}</h1>
-              {water.brandName && <p className="text-gray-500 dark:text-gray-400 mt-1">by {water.brandName}</p>}
+              {water.brandName && (
+                <p className="text-gray-500 dark:text-gray-400 mt-1">
+                  by{' '}
+                  {water.brandSlug ? (
+                    <Link href={`/brand/${water.brandSlug}`} className="hover:underline">
+                      {water.brandName}
+                    </Link>
+                  ) : (
+                    water.brandName
+                  )}
+                </p>
+              )}
 
               <div className="flex items-center gap-4 mt-4">
                 <ScoreCircle score={water.score} size={80} />
@@ -213,6 +226,8 @@ export default async function WaterDetailsPage({ params }: { params: Promise<{ i
                 </ul>
               </section>
             )}
+
+            <LabReportsSection lab={lab} labReports={water.labReports} />
 
             {water.filtrationMethods.length > 0 && (
               <section>
