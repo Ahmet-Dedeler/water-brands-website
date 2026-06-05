@@ -1,17 +1,21 @@
+import { scoreTier, SCORE_COLORS } from '@/lib/format';
+
 interface ScoreCircleProps {
     score: number;
+    size?: number; // px, default 96
 }
 
-const ScoreCircle: React.FC<ScoreCircleProps> = ({ score }) => {
+const ScoreCircle: React.FC<ScoreCircleProps> = ({ score, size = 96 }) => {
     const radius = 50;
     const circumference = 2 * Math.PI * radius;
-    const offset = circumference - (score / 100) * circumference;
+    const offset = circumference - (Math.max(0, Math.min(100, score)) / 100) * circumference;
+    const colors = SCORE_COLORS[scoreTier(score)];
 
     return (
-        <div className="relative flex items-center justify-center w-24 h-24">
-            <svg className="w-full h-full" viewBox="0 0 120 120">
+        <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+            <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
                 <circle
-                    className="text-gray-200"
+                    className="text-gray-200 dark:text-gray-700"
                     strokeWidth="10"
                     stroke="currentColor"
                     fill="transparent"
@@ -20,7 +24,7 @@ const ScoreCircle: React.FC<ScoreCircleProps> = ({ score }) => {
                     cy="60"
                 />
                 <circle
-                    className="text-green-500"
+                    className={`${colors.stroke} transition-[stroke-dashoffset] duration-500`}
                     strokeWidth="10"
                     stroke="currentColor"
                     fill="transparent"
@@ -30,14 +34,13 @@ const ScoreCircle: React.FC<ScoreCircleProps> = ({ score }) => {
                     strokeDasharray={circumference}
                     strokeDashoffset={offset}
                     strokeLinecap="round"
-                    style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
                 />
             </svg>
-            <span className="absolute text-xl font-bold text-gray-700">
-                {score}<span className="text-sm">/100</span>
+            <span className={`absolute font-bold ${colors.text}`} style={{ fontSize: size * 0.26 }}>
+                {score}
             </span>
         </div>
     );
 };
 
-export default ScoreCircle; 
+export default ScoreCircle;
