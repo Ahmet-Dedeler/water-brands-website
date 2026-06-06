@@ -21,7 +21,7 @@ const WATER_CATEGORY_TYPES = [
 ];
 
 const args = new Set(process.argv.slice(2));
-const includeTapWater = args.has('--include-tap-water');
+const includeTapWater = !args.has('--skip-tap-water');
 const auditImages = !args.has('--skip-image-audit');
 const dumpRawHugeTables = args.has('--dump-raw-huge-tables');
 
@@ -377,10 +377,12 @@ async function main() {
   const stores = await fetchByIds('stores', refs.stores, { label: 'stores' });
   const countries = await fetchByIds('countries', refs.countries, { label: 'countries' });
   const certs = await fetchByIds('certs', refs.certs, { label: 'certs' });
+  const allCerts = await fetchAll('certs', 'select=*&order=id.asc', { label: 'all certs' });
   const labs = await fetchByIds('labs', refs.labs, { label: 'labs' });
   const recalls = await fetchByIds('recalls', refs.recalls, { label: 'recalls' });
   const materials = await fetchAll('materials', 'select=*&order=id.asc', { label: 'materials' });
   const testKits = await fetchAll('test_kits', 'select=*&order=id.asc', { label: 'test kits' });
+  const research = await fetchAll('research', 'select=*&order=id.asc', { label: 'research' });
   const uiNotes = await scrapeUiNotes();
 
   const imageAudit = auditImages ? await auditProductImages(productRows) : [];
@@ -420,10 +422,12 @@ async function main() {
       stores_referenced: stores.length,
       countries_referenced: countries.length,
       certs_referenced: certs.length,
+      certs: allCerts.length,
       labs_referenced: labs.length,
       recalls_referenced: recalls.length,
       materials: materials.length,
       test_kits: testKits.length,
+      research: research.length,
       image_audit_rows: imageAudit.length,
     },
     item_type_counts: countBy(items, 'type'),
@@ -444,10 +448,12 @@ async function main() {
       'stores_referenced.json',
       'countries_referenced.json',
       'certs_referenced.json',
+      'certs.json',
       'labs_referenced.json',
       'recalls_referenced.json',
       'materials.json',
       'test_kits.json',
+      'research.json',
       'ui_notes.json',
       auditImages ? 'image_audit.json' : null,
     ].filter(Boolean),
@@ -466,10 +472,12 @@ async function main() {
   await writeJson(outputDir, 'stores_referenced.json', stores);
   await writeJson(outputDir, 'countries_referenced.json', countries);
   await writeJson(outputDir, 'certs_referenced.json', certs);
+  await writeJson(outputDir, 'certs.json', allCerts);
   await writeJson(outputDir, 'labs_referenced.json', labs);
   await writeJson(outputDir, 'recalls_referenced.json', recalls);
   await writeJson(outputDir, 'materials.json', materials);
   await writeJson(outputDir, 'test_kits.json', testKits);
+  await writeJson(outputDir, 'research.json', research);
   await writeJson(outputDir, 'ui_notes.json', uiNotes);
   if (auditImages) await writeJson(outputDir, 'image_audit.json', imageAudit);
 
