@@ -53,9 +53,9 @@ function Card({ water, rank }: { water: WaterCard; rank: number }) {
     <Link href={`/water/${water.id}`} className={cardLink}>
       <div className="flex items-start gap-4 p-5">
         <span className="text-sm font-bold text-gray-300 dark:text-gray-600 w-7 shrink-0 pt-1 tabular-nums">#{rank}</span>
-        <div className="relative w-16 h-16 shrink-0 overflow-hidden rounded-lg">
+        <div className="relative w-28 h-28 shrink-0 overflow-hidden rounded-lg">
           {water.image ? (
-            <Image src={water.image} alt="" fill sizes="64px" className="object-contain card-image-zoom motion-reduce:transform-none" loading="lazy" />
+            <Image src={water.image} alt="" fill sizes="112px" className="object-contain card-image-zoom motion-reduce:transform-none" loading="lazy" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-2xl text-gray-200 dark:text-gray-700" aria-hidden="true">💧</div>
           )}
