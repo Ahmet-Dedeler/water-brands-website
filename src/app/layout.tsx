@@ -42,7 +42,8 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    // Search Console URL-prefix property (ahmetdedelerr@gmail.com). Not a secret.
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? "Yeh-Teb81lQcVqx2IzkAeatFzBpEUpogctbYz_XnPs4",
     other: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
       ? { "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION }
       : undefined,
