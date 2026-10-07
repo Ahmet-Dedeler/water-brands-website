@@ -6,7 +6,7 @@ import { waterCards } from '@/lib/data';
 export const metadata: Metadata = {
   title: 'How Water Scores Work',
   description:
-    'How Water Leaderboard explains bottled, sparkling, gallon, flavored and hydrogen water scores from lab reports, contaminants, source, packaging and PFAS evidence.',
+    'How Water Quality Rank explains bottled, sparkling, gallon, flavored and hydrogen water scores from lab reports, contaminants, source, packaging and PFAS evidence.',
   alternates: { canonical: '/scoring' },
 };
 

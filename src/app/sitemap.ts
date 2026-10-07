@@ -1,26 +1,31 @@
 import type { MetadataRoute } from "next";
+import { RANKINGS } from "@/lib/rankings";
+import { COMPARISONS } from "@/lib/compare";
+import { GUIDES } from "@/lib/guides";
 import {
   brands,
   ingredientList,
   siteUrl,
   tapWaterCards,
   waterCards,
+  waters,
   waterFilterCards,
 } from "@/lib/data";
 
 // Keep the sitemap useful for search engines without publishing a complete
 // machine-readable inventory of every scraped/detail URL on the site.
-const MAX_SITEMAP_WATERS = 500;
+const MAX_SITEMAP_WATERS = 1200;
 const MAX_SITEMAP_FILTERS = 250;
 const MAX_SITEMAP_INGREDIENTS = 300;
-const MAX_SITEMAP_BRANDS = 300;
+const MAX_SITEMAP_BRANDS = 600;
 const MAX_SITEMAP_TAP_WATER = 250;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const sitemapWaters = waterCards
-    .toSorted((a, b) => b.score - a.score)
-    .slice(0, MAX_SITEMAP_WATERS);
+  // Popular products first (what people search for), then top scorers.
+  const byViews = waters.toSorted((a, b) => b.views - a.views).slice(0, MAX_SITEMAP_WATERS / 2);
+  const byScore = waterCards.toSorted((a, b) => b.score - a.score).slice(0, MAX_SITEMAP_WATERS);
+  const sitemapWaters = [...new Map([...byViews, ...byScore].map((w) => [w.id, w])).values()].slice(0, MAX_SITEMAP_WATERS);
   const sitemapFilters = waterFilterCards
     .toSorted((a, b) => b.score - a.score)
     .slice(0, MAX_SITEMAP_FILTERS);
@@ -50,6 +55,42 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.95,
+    },
+    {
+      url: `${siteUrl}/best`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.95,
+    },
+    ...RANKINGS.map((r) => ({
+      url: `${siteUrl}/best/${r.slug}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.9,
+    })),
+    {
+      url: `${siteUrl}/guides`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    ...GUIDES.map((g) => ({
+      url: `${siteUrl}/guides/${g.slug}`,
+      lastModified: new Date(g.updated),
+      changeFrequency: "monthly" as const,
+      priority: 0.85,
+    })),
+    ...COMPARISONS.map((c) => ({
+      url: `${siteUrl}/compare/${c.slug}`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+    {
+      url: `${siteUrl}/about`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.5,
     },
     {
       url: `${siteUrl}/scoring`,

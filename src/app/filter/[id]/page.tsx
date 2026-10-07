@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const filter = getWaterFilter(id);
   if (!filter) return { title: 'Filter Not Found' };
 
-  const title = `${filter.name} — Score ${filter.score}/100`;
+  const title = `${filter.name} Review: ${filter.score}/100 Lab-Tested Score`;
   const description =
     filter.description ||
     `${filter.name}${filter.brandName ? ` by ${filter.brandName}` : ''} scores ${filter.score}/100 for contaminant removal and certifications.`;

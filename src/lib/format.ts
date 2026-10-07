@@ -77,3 +77,10 @@ export const microplasticsRisk = (packaging: string | null): 'High' | 'Moderate'
   if (p.includes('glass')) return 'Low';
   return 'Moderate';
 };
+
+/** Lowercase a label for use mid-sentence, keeping acronyms ("PFAS testing"). */
+export const lowerLabel = (label: string) =>
+  label
+    .split(' ')
+    .map((word) => (/^[A-Z0-9]{2,}$/.test(word) ? word : word.toLowerCase()))
+    .join(' ');

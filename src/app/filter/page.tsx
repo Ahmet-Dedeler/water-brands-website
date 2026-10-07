@@ -4,7 +4,7 @@ import Header from '@/components/Header';
 import FilterLeaderboard from '@/components/FilterLeaderboard';
 
 export const metadata: Metadata = {
-  title: 'Water Filter Leaderboard',
+  title: 'Best Water Filters Ranked by Lab-Tested Contaminant Removal',
   description:
     'Every pitcher, RO system, shower and faucet filter ranked by verified contaminant removal, certifications and lab data.',
   alternates: { canonical: '/filter' },

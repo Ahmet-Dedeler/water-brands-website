@@ -4,7 +4,7 @@ import Header from '@/components/Header';
 import IngredientLeaderboard from '@/components/IngredientLeaderboard';
 
 export const metadata: Metadata = {
-  title: 'Water Ingredients & Contaminants',
+  title: 'Water Contaminants & Minerals: Health Risks and Limits',
   description:
     'Contaminants and minerals found in ranked waters and tap water systems — health guidelines, risks and which products contain each compound.',
   alternates: { canonical: '/ingredients' },

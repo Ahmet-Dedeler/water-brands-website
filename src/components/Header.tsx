@@ -8,7 +8,7 @@ import { searchFilters, searchIngredients, searchWaters } from '@/lib/search';
 import { waterTypeLabel, filterTypeLabel } from '@/lib/format';
 import { pillActive, pillButton, pillInactive, inputField, motionPress } from '@/lib/ui-classes';
 
-type Section = 'drinks' | 'filter' | 'tap-water' | 'scoring' | 'ingredient';
+type Section = 'drinks' | 'filter' | 'tap-water' | 'scoring' | 'ingredient' | 'best' | 'guides';
 
 export default function Header() {
   const pathname = usePathname();
@@ -22,7 +22,11 @@ export default function Header() {
           ? 'ingredient'
           : pathname.startsWith('/scoring')
             ? 'scoring'
-            : 'drinks';
+            : pathname.startsWith('/best') || pathname.startsWith('/compare')
+              ? 'best'
+              : pathname.startsWith('/guides')
+                ? 'guides'
+                : 'drinks';
 
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -138,7 +142,8 @@ export default function Header() {
   }, []);
 
   const navLinkClass = (active: boolean) =>
-    `${pillButton} ${active ? pillActive : `${pillInactive} border-transparent dark:border-transparent`}`;
+    // Seven items: tighter padding below sm so the row fits a 375px phone.
+    `${pillButton.replace('px-4', 'px-2 sm:px-4')} ${active ? pillActive : `${pillInactive} border-transparent dark:border-transparent`}`;
 
   return (
     <header className={`sticky top-0 z-20 bg-white/85 dark:bg-[var(--surface-page)]/90 backdrop-blur border-b border-gray-100 dark:border-[var(--border-soft)] mb-8 transition-shadow duration-200 ${scrolled ? 'header-scrolled' : ''}`}>
@@ -148,11 +153,12 @@ export default function Header() {
               the wrapper dissolves so all three items sit on a single bar. */}
           <div className="flex items-center justify-between gap-2 lg:contents">
             <Link href="/" className={`flex items-center gap-2 font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap shrink-0 ${motionPress}`}>
-              <span className="text-xl">🚰</span>
-              <span className="hidden sm:inline">Water Leaderboard</span>
+              {/* eslint-disable-next-line @next/next/no-img-element -- tiny static SVG logo */}
+              <img src="/logo.svg" alt="" width={28} height={28} className="w-7 h-7 rounded-lg" />
+              <span className="hidden sm:inline">Water Quality Rank</span>
             </Link>
 
-            <nav className="flex items-center gap-1 shrink-0 lg:ml-auto" aria-label="Product categories">
+            <nav className="flex items-center gap-0.5 sm:gap-1 shrink-0 lg:ml-auto" aria-label="Product categories">
               <Link href="/" aria-label="Drinks" className={navLinkClass(section === 'drinks')}>
                 <span aria-hidden="true">💧</span>
                 <span className="hidden lg:inline">Drinks</span>
@@ -168,6 +174,14 @@ export default function Header() {
               <Link href="/ingredients" aria-label="Ingredients" className={navLinkClass(section === 'ingredient')}>
                 <span aria-hidden="true">🧪</span>
                 <span className="hidden lg:inline">Ingredients</span>
+              </Link>
+              <Link href="/best" aria-label="Best of" className={navLinkClass(section === 'best')}>
+                <span aria-hidden="true">🏆</span>
+                <span className="hidden lg:inline">Best</span>
+              </Link>
+              <Link href="/guides" aria-label="Guides" className={navLinkClass(section === 'guides')}>
+                <span aria-hidden="true">📚</span>
+                <span className="hidden lg:inline">Guides</span>
               </Link>
               <Link href="/scoring" aria-label="Scoring" className={navLinkClass(section === 'scoring')}>
                 <span aria-hidden="true">📊</span>

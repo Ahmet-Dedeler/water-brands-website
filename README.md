@@ -1,4 +1,6 @@
-# Water Leaderboard
+# Water Quality Rank
+
+Live at [waterqualityrank.org](https://waterqualityrank.org).
 
 A cozy, easy-to-browse leaderboard for bottled waters and home water filters — ranked by lab data, source quality, packaging, and contaminant removal. Data comes from [Oasis](https://www.oasishealth.app).
 
@@ -34,7 +36,9 @@ Keep new UI consistent with what's already in the app.
 
 | Where | Emoji | Meaning |
 |-------|-------|---------|
-| Logo / favicon | 🚰 | Water leaderboard |
+| Logo / favicon | droplet + check (`scripts/brand/logo.svg`) | Water Quality Rank — 🚰 still used in copy |
+| Header → Best | 🏆 | `/best` keyword ranking pages |
+| Header → Guides | 📚 | `/guides` long-form articles |
 | Header → Drinks | 💧 | Bottled & drinkable waters |
 | Header → Filter | 🫖 | Home water filter products |
 | Header → Scoring | 📊 | How scores are calculated |
@@ -200,3 +204,15 @@ OASIS_TAP_WATER_IDS_FILE=/tmp/missing-tap-ids.txt npm run import:oasis:tap-water
 ```
 
 Raw scrape output lives in `data/oasis/latest/` (gitignored). Run `npm run build:data` after scraping to refresh `src/data/`.
+
+## SEO & AI search
+
+Where search traffic comes from, and where to add more:
+
+- **`/best/[slug]`** — one page per search intent ("healthiest bottled water", "best shower filter"). Defined in `src/lib/rankings.ts`; add an entry to target a new query.
+- **`/compare/[a]-vs-[b]`** — brand head-to-heads ("fiji vs evian"), generated from `POPULAR_BRAND_SLUGS` in `src/lib/compare.ts`. Reversed slugs 308 to the canonical one.
+- **`/guides/[slug]`** — long-form answers in `src/lib/guides.tsx`. Numbers are computed from the dataset, so they stay true after a data refresh. Bump `CONTENT_UPDATED` in `src/lib/site.ts` when content changes.
+- **Structured data** — `src/components/seo.tsx` (FAQPage, ItemList, BreadcrumbList, Article, Product+Review, Organization/WebSite).
+- **AI answer engines** — `/llms.txt` is generated from live data; `robots.ts` and `proxy.ts` explicitly allow GPTBot, ClaudeBot, PerplexityBot, Google-Extended and friends.
+- **After deploying**: `npm run indexnow` pings Bing/Yandex (and DuckDuckGo via Bing) with every sitemap URL. Google picks up `/sitemap.xml` via Search Console.
+- Optional env vars `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` / `NEXT_PUBLIC_BING_SITE_VERIFICATION` add verification meta tags.

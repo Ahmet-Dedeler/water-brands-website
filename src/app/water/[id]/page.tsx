@@ -2,7 +2,12 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import type { Water, IngredientsMap, ScoreBreakdownItem } from '@/types';
-import { getLab, getWater, ingredients, siteUrl } from '@/lib/data';
+import { getLab, getWater, ingredients, siteUrl, waters } from '@/lib/data';
+import { pageMetadata } from '@/lib/metadata';
+import { comparisonsFor } from '@/lib/compare';
+import { RANKINGS } from '@/lib/rankings';
+import { SITE_NAME } from '@/lib/site';
+import { Breadcrumbs, breadcrumbLd, JsonLd } from '@/components/seo';
 import Header from '@/components/Header';
 import ScoreCircle from '@/components/ScoreCircle';
 import ScoreBarAnimated from '@/components/ScoreBarAnimated';
@@ -17,22 +22,19 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const water = getWater(id);
   if (!water) return { title: 'Water Not Found' };
 
-  const title = `${water.name} — Score ${water.score}/100`;
-  const description =
-    water.description ||
-    `${water.name}${water.brandName ? ` by ${water.brandName}` : ''} scores ${water.score}/100 for purity, source and packaging.`;
+  const title = `${water.name}: ${water.score}/100 Purity Score & Lab Test`;
+  const contaminants = resolveIngredients(water).filter((i) => i.is_contaminant).length;
+  const facts = [
+    water.hasLabTest ? 'lab tested' : 'no lab report on file',
+    `${contaminants} contaminant${contaminants === 1 ? '' : 's'} flagged`,
+    water.packaging && `${water.packaging} packaging`,
+    water.ph ? `pH ${water.ph}` : null,
+  ].filter(Boolean);
+  const description = `Is ${water.name} healthy? It scores ${water.score}/100${
+    water.brandName ? ` (${water.brandName})` : ''
+  }: ${facts.join(', ')}. See contaminants, minerals, microplastics risk and the full score breakdown.`;
 
-  return {
-    title,
-    description,
-    alternates: { canonical: `/water/${id}` },
-    openGraph: {
-      title,
-      description,
-      url: `/water/${id}`,
-      images: water.image ? [{ url: water.image, width: 800, height: 600, alt: water.name }] : [],
-    },
-  };
+  return { ...pageMetadata({ title, description, path: `/water/${id}`, image: water.image }), title: { absolute: title } };
 }
 
 function resolveIngredients(water: Water) {
@@ -85,6 +87,19 @@ export default async function WaterDetailsPage({ params }: { params: Promise<{ i
     water.isDistilled && 'Distilled',
   ].filter(Boolean) as string[];
 
+  // Rank within its own type ("#4 of 680 still waters").
+  const sameType = waters.filter((w) => w.type === water.type).toSorted((a, b) => b.score - a.score);
+  const rank = sameType.findIndex((w) => w.id === water.id) + 1;
+  const rankings = RANKINGS.filter(
+    (r): r is Extract<(typeof RANKINGS)[number], { kind: 'water' }> => r.kind === 'water' && r.filter(water),
+  ).slice(0, 4);
+  const comparisons = water.brandSlug ? comparisonsFor(water.brandSlug).slice(0, 6) : [];
+  const crumbs = [
+    ...(water.brandSlug && water.brandName ? [{ name: water.brandName, path: `/brand/${water.brandSlug}` }] : []),
+    { name: water.name, path: `/water/${water.id}` },
+  ];
+
+  // Editorial review of a third-party product (not self-serving), so Review is the right type.
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -93,25 +108,20 @@ export default async function WaterDetailsPage({ params }: { params: Promise<{ i
     image: water.image ?? undefined,
     brand: water.brandName ? { '@type': 'Brand', name: water.brandName } : undefined,
     url: `${siteUrl}/water/${water.id}`,
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: water.score,
-      bestRating: 100,
-      worstRating: 0,
+    review: {
+      '@type': 'Review',
+      reviewRating: { '@type': 'Rating', ratingValue: water.score, bestRating: 100, worstRating: 0 },
+      author: { '@type': 'Organization', name: SITE_NAME, url: siteUrl },
+      reviewBody: `${water.name} scores ${water.score}/100 for purity based on lab reports, contaminants, source, packaging and PFAS testing.`,
     },
   };
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-[var(--surface-page)]">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={[jsonLd, breadcrumbLd(crumbs)]} />
       <Header />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <Link href="/" className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4 inline-block link-back">
-          &larr; Back to all waters
-        </Link>
+        <Breadcrumbs crumbs={crumbs} />
 
         <div className="bg-white dark:bg-[var(--surface-raised)] border border-gray-200 dark:border-[var(--border-soft)] rounded-2xl shadow-sm overflow-hidden">
           <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -154,6 +164,10 @@ export default async function WaterDetailsPage({ params }: { params: Promise<{ i
                   <div className="text-gray-900 dark:text-gray-100 font-medium">out of 100</div>
                 </div>
               </div>
+              <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                Ranked <strong className="text-gray-900 dark:text-gray-100">#{rank}</strong> of {sameType.length.toLocaleString()}{' '}
+                {waterTypeLabel(water.type).toLowerCase()} waters.
+              </p>
 
               {chips.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-5">
@@ -270,6 +284,29 @@ export default async function WaterDetailsPage({ params }: { params: Promise<{ i
                 {nutrients.length === 0 && <p className="text-sm text-gray-500 dark:text-gray-400">No minerals listed.</p>}
               </ul>
             </section>
+
+            {(rankings.length > 0 || comparisons.length > 0) && (
+              <section>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3">How it compares</h2>
+                <ul className="flex flex-wrap gap-2">
+                  {rankings.map((r) => (
+                    <li key={r.slug}>
+                      <Link href={`/best/${r.slug}`} className="inline-block rounded-full bg-sky-50 px-3 py-1 text-sm text-sky-800 hover:bg-sky-100 dark:bg-sky-950/50 dark:text-sky-300">
+                        <span aria-hidden="true">{r.emoji} </span>
+                        {r.label}
+                      </Link>
+                    </li>
+                  ))}
+                  {comparisons.map((c) => (
+                    <li key={c.slug}>
+                      <Link href={`/compare/${c.slug}`} className="inline-block rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700 hover:bg-gray-200 dark:bg-[var(--surface-muted)] dark:text-gray-200">
+                        {c.aBrand} vs {c.bBrand}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
 
             {water.sources.length > 0 && (
               <section>

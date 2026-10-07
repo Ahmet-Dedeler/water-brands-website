@@ -6,7 +6,7 @@ import TapWaterFeatured from '@/components/TapWaterFeatured';
 import TapWaterLeaderboard from '@/components/TapWaterLeaderboard';
 
 export const metadata: Metadata = {
-  title: 'Tap Water Rankings',
+  title: 'Tap Water Quality by City: Is Your Tap Water Safe?',
   description:
     'Municipal tap water quality by city and utility — contaminants, guideline exceedances and local water system scores across the United States.',
   alternates: { canonical: '/tap-water' },

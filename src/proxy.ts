@@ -46,13 +46,29 @@ const SCRIPT_OR_SCRAPER_UA_PATTERNS = [
   /nmap/i,
 ];
 
+// Search engines and AI answer engines get a much higher budget: we want them
+// to crawl and cite the site.
 const SEARCH_CRAWLER_UA_PATTERNS = [
   /googlebot/i,
+  /google-inspectiontool/i,
+  /google-extended/i,
   /bingbot/i,
   /duckduckbot/i,
   /slurp/i,
   /yandexbot/i,
   /baiduspider/i,
+  /applebot/i,
+  /gptbot/i,
+  /oai-searchbot/i,
+  /chatgpt-user/i,
+  /claudebot/i,
+  /claude-searchbot/i,
+  /claude-user/i,
+  /perplexitybot/i,
+  /perplexity-user/i,
+  /ccbot/i,
+  /meta-externalagent/i,
+  /mistralai-user/i,
 ];
 
 function clientIp(request: NextRequest) {
@@ -158,7 +174,9 @@ export function proxy(request: NextRequest) {
   const ip = clientIp(request);
   const uaKey = hashString(userAgent.toLowerCase());
 
-  if (isSitemap) {
+  const isSearchCrawler = matchesAny(userAgent, SEARCH_CRAWLER_UA_PATTERNS);
+
+  if (isSitemap && !isSearchCrawler) {
     const { limited, retryAfter } = checkRateLimit(`sitemap:${ip}:${uaKey}`, 4, ONE_HOUR, now);
     if (limited) {
       return guardedResponse('Too many sitemap requests. Please retry later.', 429, retryAfter);
@@ -166,7 +184,6 @@ export function proxy(request: NextRequest) {
   }
 
   if (isDetailRoute) {
-    const isSearchCrawler = matchesAny(userAgent, SEARCH_CRAWLER_UA_PATTERNS);
     const limit = isSearchCrawler ? 300 : isHtmlNavigation(request) ? 60 : 20;
     const { limited, retryAfter } = checkRateLimit(`detail:${ip}:${uaKey}`, limit, FIVE_MINUTES, now);
 

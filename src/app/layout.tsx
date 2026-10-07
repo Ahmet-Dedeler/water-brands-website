@@ -1,43 +1,69 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { siteUrl, waterCards } from "@/lib/data";
+import { CONTENT_YEAR, SITE_NAME } from "@/lib/site";
+import Footer from "@/components/Footer";
+import { JsonLd, publisherLd } from "@/components/seo";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
-/** Tab icon — literal emoji rendered by the browser, not a custom SVG asset. */
-const SITE_EMOJI = "🚰";
-const emojiIcon = `data:image/svg+xml,${encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">${SITE_EMOJI}</text></svg>`
-)}`;
+// Icons come from the file conventions in this folder (favicon.ico, icon.svg,
+// apple-icon.png). Google's result favicon needs a real file, not a data URI.
 
-const siteDescription = `Compare ${waterCards.length.toLocaleString()} bottled, sparkling and gallon waters ranked by lab-tested purity, source quality, packaging and contaminants.`;
+const homeTitle = `Best Bottled Water Brands (${CONTENT_YEAR}): Healthiest Waters Ranked`;
+const siteDescription = `Which bottled water is healthiest? ${waterCards.length.toLocaleString()} bottled, sparkling and gallon waters ranked by lab-tested contaminants, microplastics, PFAS, source and packaging.`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Water Brands Leaderboard",
-    template: `%s | Water Brands Leaderboard`,
+    default: homeTitle,
+    template: `%s | ${SITE_NAME}`,
   },
   description: siteDescription,
-  icons: {
-    icon: emojiIcon,
-    apple: emojiIcon,
-  },
+  applicationName: SITE_NAME,
   openGraph: {
-    title: "Water Brands Leaderboard",
+    title: homeTitle,
     description: siteDescription,
     type: "website",
     locale: "en_US",
-    siteName: "Water Brands Leaderboard",
+    siteName: SITE_NAME,
+    url: "/",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Water Brands Leaderboard",
+    title: homeTitle,
     description: siteDescription,
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    other: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+      ? { "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION }
+      : undefined,
+  },
 };
+
+export const viewport: Viewport = {
+  themeColor: "#0284c7",
+};
+
+const siteLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: SITE_NAME,
+    url: siteUrl,
+    description: siteDescription,
+    publisher: publisherLd,
+  },
+  { "@context": "https://schema.org", ...publisherLd },
+];
 
 export default function RootLayout({
   children,
@@ -47,7 +73,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        <JsonLd data={siteLd} />
         {children}
+        <Footer />
         <Analytics />
       </body>
     </html>

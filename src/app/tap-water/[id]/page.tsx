@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   if (!location) return { title: 'Tap Water Not Found' };
 
   const place = [location.name, location.state, location.zipCode].filter(Boolean).join(', ');
-  const title = `${place} Tap Water Quality`;
+  const title = `Is ${place} Tap Water Safe to Drink? Water Quality Report`;
   const scorePart = location.score != null ? ` Score ${location.score}/100.` : '';
   const description = `Tap water quality for ${place}: contaminants, utility scores and guideline exceedances.${scorePart}`;
 

@@ -61,7 +61,7 @@ function Card({ water, rank }: { water: WaterCard; rank: number }) {
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <h2 className="font-semibold text-gray-900 dark:text-gray-100 leading-snug line-clamp-2">{water.name}</h2>
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100 leading-snug line-clamp-2">{water.name}</h3>
           {water.brandName && <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 truncate">{water.brandName}</p>}
         </div>
         <ScoreBadge score={water.score} />

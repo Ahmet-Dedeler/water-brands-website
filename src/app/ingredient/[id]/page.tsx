@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const ingredient = getIngredient(id);
   if (!ingredient) return { title: 'Ingredient Not Found' };
 
-  const title = `${ingredient.name} in Water`;
+  const title = `${ingredient.name} in Drinking Water: Health Effects & Limits`;
   const description =
     ingredient.description ||
     `${ingredient.name} health profile, water guidelines, risks, benefits and references.`;

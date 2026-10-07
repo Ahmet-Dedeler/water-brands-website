@@ -6,7 +6,7 @@ import { waterFilterCards } from '@/lib/data';
 export const metadata: Metadata = {
   title: 'How Water Filter Scores Work',
   description:
-    'How Water Leaderboard explains water filter scores from verified contaminant removal, lab data, certifications and disclosed filter technology.',
+    'How Water Quality Rank explains water filter scores from verified contaminant removal, lab data, certifications and disclosed filter technology.',
   alternates: { canonical: '/scoring/water-filters' },
 };
 
