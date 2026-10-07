@@ -102,6 +102,17 @@ function isHtmlNavigation(request: NextRequest) {
   return accept.includes('text/html') || secFetchDest === 'document';
 }
 
+/**
+ * Next.js prefetches every <Link> that scrolls into view, and the leaderboards
+ * show 60+ detail links per page. Counting those would rate-limit ordinary
+ * visitors who scroll and then click a product. Next strips its own `rsc` /
+ * `next-router-prefetch` headers before the proxy runs, so detect the app's
+ * fetches by the browser-set Sec-Fetch headers instead (pages can't forge them).
+ */
+function isInAppFetch(request: NextRequest) {
+  return request.headers.get('sec-fetch-site') === 'same-origin' && request.headers.get('sec-fetch-mode') === 'cors';
+}
+
 function cleanBuckets(now: number) {
   if (rateLimitBuckets.size <= MAX_BUCKETS) return;
 
@@ -183,7 +194,7 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  if (isDetailRoute) {
+  if (isDetailRoute && !isInAppFetch(request)) {
     const limit = isSearchCrawler ? 300 : isHtmlNavigation(request) ? 60 : 20;
     const { limited, retryAfter } = checkRateLimit(`detail:${ip}:${uaKey}`, limit, FIVE_MINUTES, now);
 
