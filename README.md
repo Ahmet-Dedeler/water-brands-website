@@ -145,8 +145,19 @@ That means the normal frontend refresh path is:
 ```bash
 npm run scrape:oasis
 npm run build:data
+npm run images:sync   # before deploying, so new product images exist
 npm run build
 ```
+
+### Images
+
+Product, filter, ingredient and brand images do **not** use Vercel image optimization (it bills per transform and per byte). `scripts/sync-images.mts` converts each source image to 256px and 640px WebP files and uploads them to the Cloudflare R2 bucket `waterqualityrank-images` (AhmetBuilds account), served at `https://img.waterqualityrank.org` with free egress. The custom `next/image` loader in `src/lib/image-loader.ts` maps every source URL to its file (see `src/lib/image-cdn.ts`).
+
+- Run `images:sync` before deploying new data. It needs `CLOUDFLARE_API_TOKEN` with R2 write access, and skips files that already exist.
+- Don't open an image URL before its file is uploaded: Cloudflare caches the 404 for about 4 hours.
+- Tap-water city photos and Open Graph images still point straight at the Oasis URLs, so they cost nothing on Vercel.
+
+Detail pages (`/water`, `/filter`, `/ingredient`, `/tap-water`) render on first request and are then cached until the next deploy (`generateStaticParams` returns `[]`).
 
 Supabase is the durable raw-data store, not the live app backend yet. It keeps the richer scrape output around for future features, analysis, search, tap-water pages, and any move away from static JSON.
 

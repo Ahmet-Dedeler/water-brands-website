@@ -8,6 +8,13 @@ import { getIngredient, siteUrl, waters } from '@/lib/data';
 import { waterTypeLabel } from '@/lib/format';
 import { cardLink } from '@/lib/ui-classes';
 
+// Render each page on its first request, then serve it from the CDN cache until the
+// next deploy. The data is bundled JSON, so pages never change between deploys, and
+// this avoids paying for a function run on every visit.
+export async function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const ingredient = getIngredient(id);

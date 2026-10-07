@@ -11,7 +11,8 @@
     "build:data": "node scripts/build-site-data.mjs",
     "import:oasis:supabase": "node scripts/import-oasis-to-supabase.mjs",
     "import:oasis:tap-water": "node scripts/import-oasis-tap-water-to-supabase.mjs",
-    "indexnow": "node scripts/indexnow.mjs"
+    "indexnow": "node scripts/indexnow.mjs",
+    "images:sync": "node scripts/sync-images.mts"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
@@ -26,6 +27,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "^16.2.7",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4.3.0",
     "typescript": "^5.9"
   }
