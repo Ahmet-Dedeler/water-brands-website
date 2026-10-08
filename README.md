@@ -1,8 +1,30 @@
-# Water Quality Rank
+<div align="center">
 
-Live at [waterqualityrank.org](https://waterqualityrank.org).
+<a href="https://waterqualityrank.org"><img src="docs/readme/home.jpg" alt="Water Quality Rank" width="100%"></a>
 
-A cozy, easy-to-browse leaderboard for bottled waters and home water filters — ranked by lab data, source quality, packaging, and contaminant removal. Data comes from [Oasis](https://www.oasishealth.app).
+### Which bottled water and filter is actually clean?
+
+[![Live site](https://img.shields.io/badge/live-waterqualityrank.org-0284c7?style=flat-square)](https://waterqualityrank.org)
+![Next.js 16](https://img.shields.io/badge/Next.js-16-111827?style=flat-square)
+![No paid placements](https://img.shields.io/badge/paid%20placements-none-16a34a?style=flat-square)
+
+**[Open the site](https://waterqualityrank.org)** ·
+**[Best bottled water](https://waterqualityrank.org/best)** ·
+**[Filters](https://waterqualityrank.org/filter)** ·
+**[Tap water](https://waterqualityrank.org/tap-water)** ·
+**[How scoring works](https://waterqualityrank.org/scoring)**
+
+</div>
+
+---
+
+A warm, easy-to-browse leaderboard for bottled waters and home water filters, ranked by lab data, source quality,
+packaging and contaminant removal. Data comes from [Oasis](https://www.oasishealth.app).
+
+- 💧 **2,700+ bottled waters**: still, sparkling, gallon, flavored and hydrogen, each with a 100-point purity score.
+- 🫖 **460+ water filters**: pitchers, reverse osmosis, shower, sink, bottle and whole-home.
+- 🧪 **Ingredients**: every contaminant, mineral and PFAS compound with the guideline it's measured against.
+- 🚰 **Tap water** for US cities, 🏆 `/best` rankings, ⚖️ brand-vs-brand comparisons and 📚 guides.
 
 ## Getting started
 
@@ -14,6 +36,7 @@ npm run build:data     # distill scrape → src/data/*.json
 npm run import:oasis:supabase   # archive rich scrape data in Supabase
 npm run import:oasis:tap-water  # stream the huge tap-water file into Supabase
 npm run build          # production build
+npm run check:schema   # JSON-LD vs Google's rules (needs `npm start` running)
 ```
 
 ## Design & tone
@@ -120,13 +143,14 @@ Shared classes: `globals.css` (motion tokens + entrance utilities), `src/lib/ui-
 
 ```
 src/
-  app/           # Next.js routes (/, /filter, /water/[id], /filter/[id], /ingredient/[id])
+  app/           # Next.js routes (/, /water/[id], /filter, /filter/[id], /ingredient/[id], /tap-water, /brand, /best, /compare, /guides)
   components/    # Header, Leaderboard, FilterLeaderboard, WaterFilters, …
   data/          # Generated JSON shipped with the site
   lib/           # data loaders, format helpers, filter logic
 scripts/
   scrape-oasis.mjs      # Oasis Supabase scrape
   build-site-data.mjs   # Oasis → src/data
+  check-structured-data.mjs  # JSON-LD checker (npm run check:schema)
 ```
 
 ## Data
@@ -223,7 +247,7 @@ Where search traffic comes from, and where to add more:
 - **`/best/[slug]`** — one page per search intent ("healthiest bottled water", "best shower filter"). Defined in `src/lib/rankings.ts`; add an entry to target a new query.
 - **`/compare/[a]-vs-[b]`** — brand head-to-heads ("fiji vs evian"), generated from `POPULAR_BRAND_SLUGS` in `src/lib/compare.ts`. Reversed slugs 308 to the canonical one.
 - **`/guides/[slug]`** — long-form answers in `src/lib/guides.tsx`. Numbers are computed from the dataset, so they stay true after a data refresh. Bump `CONTENT_UPDATED` in `src/lib/site.ts` when content changes.
-- **Structured data** — `src/components/seo.tsx` (FAQPage, ItemList, BreadcrumbList, Article, Product+Review, Organization/WebSite).
+- **Structured data** — `src/components/seo.tsx` (FAQPage, ItemList, BreadcrumbList, Article, Product+Review, Organization/WebSite). Scores are editorial, so products use `review`, never `aggregateRating`. `npm run check:schema` checks every page template; see AGENTS.md.
 - **AI answer engines** — `/llms.txt` is generated from live data; `robots.ts` and `proxy.ts` explicitly allow GPTBot, ClaudeBot, PerplexityBot, Google-Extended and friends.
 - **After deploying**: `npm run indexnow` pings Bing/Yandex (and DuckDuckGo via Bing) with every sitemap URL. Google picks up `/sitemap.xml` via Search Console.
 - Optional env vars `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` / `NEXT_PUBLIC_BING_SITE_VERIFICATION` add verification meta tags.

@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "water-quality-rank",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,7 +12,9 @@
     "import:oasis:supabase": "node scripts/import-oasis-to-supabase.mjs",
     "import:oasis:tap-water": "node scripts/import-oasis-tap-water-to-supabase.mjs",
     "indexnow": "node scripts/indexnow.mjs",
-    "images:sync": "node scripts/sync-images.mts"
+    "images:sync": "node scripts/sync-images.mts",
+    "check:schema": "node scripts/check-structured-data.mjs --sitemap http://localhost:3000/sitemap.xml",
+    "check:schema:prod": "node scripts/check-structured-data.mjs --sitemap https://waterqualityrank.org/sitemap.xml"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
