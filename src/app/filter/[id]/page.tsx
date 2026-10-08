@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import type { ScoreBreakdownItem } from '@/types';
 import { getLab, getWaterFilter, siteUrl } from '@/lib/data';
+import { SITE_NAME } from '@/lib/site';
 import Header from '@/components/Header';
 import ScoreCircle from '@/components/ScoreCircle';
 import ScoreBarAnimated from '@/components/ScoreBarAnimated';
@@ -71,6 +72,8 @@ export default async function FilterDetailsPage({ params }: { params: Promise<{ 
     filter.price != null && `$${filter.price}`,
   ].filter(Boolean) as string[];
 
+  // Editorial review of a third-party product, not user ratings: AggregateRating would need a
+  // ratingCount/reviewCount we don't have (Google Search Console flags it), so use Review.
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -79,11 +82,11 @@ export default async function FilterDetailsPage({ params }: { params: Promise<{ 
     image: filter.image ?? undefined,
     brand: filter.brandName ? { '@type': 'Brand', name: filter.brandName } : undefined,
     url: `${siteUrl}/filter/${filter.id}`,
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: filter.score,
-      bestRating: 100,
-      worstRating: 0,
+    review: {
+      '@type': 'Review',
+      reviewRating: { '@type': 'Rating', ratingValue: filter.score, bestRating: 100, worstRating: 0 },
+      author: { '@type': 'Organization', name: SITE_NAME, url: siteUrl },
+      reviewBody: `${filter.name} scores ${filter.score}/100 based on independent lab testing of the contaminants it removes.`,
     },
   };
 
