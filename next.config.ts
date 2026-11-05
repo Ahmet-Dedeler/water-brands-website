@@ -1,6 +1,14 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // First-party PostHog proxy (see components/PostHogAnalytics.tsx).
+  skipTrailingSlashRedirect: true,
+  async rewrites() {
+    return [
+      { source: "/_ph/static/:path*", destination: "https://us-assets.i.posthog.com/static/:path*" },
+      { source: "/_ph/:path*", destination: "https://us.i.posthog.com/:path*" },
+    ];
+  },
   images: {
     // Images are pre-built WebP files on Cloudflare R2 (img.waterqualityrank.org),
     // so Vercel's paid on-demand image optimization is never used.

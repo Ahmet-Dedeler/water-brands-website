@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
 import { siteUrl, waterCards } from "@/lib/data";
 import { CONTENT_YEAR, SITE_NAME } from "@/lib/site";
 import Footer from "@/components/Footer";
+import PostHogAnalytics from "@/components/PostHogAnalytics";
 import { JsonLd, publisherLd } from "@/components/seo";
 import "./globals.css";
 
@@ -77,7 +77,7 @@ export default function RootLayout({
         <JsonLd data={siteLd} />
         {children}
         <Footer />
-        <Analytics />
+        <PostHogAnalytics />
       </body>
     </html>
   );
